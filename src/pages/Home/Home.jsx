@@ -2,17 +2,17 @@ import React, { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { useGLTF } from '@react-three/drei';
-import { Box3, Color, Vector3 } from 'three';
+import { Box3, Vector3 } from 'three';
 import { useContent } from '../../context/useContent';
 import './Home.css';
 
-import heroBackground from '../../assets/abstract_architecture_hero.png';
 import jaLogoModel from '../../assets/Jeeshnu logo - 3D.glb?url';
 
-const bronze = new Color('#b47843');
+const LOGO_ROTATION_SPEED = 1.2; // radians per second
 
 function JaLogoModel({ motionEnabled }) {
     const { scene } = useGLTF(jaLogoModel);
+    const rotatingGroup = useRef(null);
     const { object, scale, offset } = useMemo(() => {
         const object = scene.clone(true);
         object.traverse((child) => {
@@ -20,12 +20,6 @@ function JaLogoModel({ motionEnabled }) {
             child.material = Array.isArray(child.material)
                 ? child.material.map((material) => material.clone())
                 : child.material.clone();
-            const materials = Array.isArray(child.material) ? child.material : [child.material];
-            materials.forEach((material) => {
-                if (material.color) material.color.lerp(bronze, 0.4);
-                if ('metalness' in material) material.metalness = Math.min(material.metalness, 0.62);
-                if ('roughness' in material) material.roughness = Math.max(material.roughness, 0.2);
-            });
         });
         const bounds = new Box3().setFromObject(object);
         const center = bounds.getCenter(new Vector3());
@@ -33,26 +27,50 @@ function JaLogoModel({ motionEnabled }) {
         const scale = 1.65 / Math.max(size.x, size.y, size.z, 0.001);
         return { object, scale, offset: center.multiplyScalar(-scale).toArray() };
     }, [scene]);
-    const rotatingGroup = useRef(null);
+
+    useEffect(() => () => {
+        object.traverse((child) => {
+            if (!child.isMesh) return;
+            const materials = Array.isArray(child.material) ? child.material : [child.material];
+            materials.forEach((material) => material.dispose());
+        });
+    }, [object]);
 
     useFrame((_, delta) => {
-        if (motionEnabled && rotatingGroup.current) {
-            rotatingGroup.current.rotation.y += delta * 0.7;
-        }
+        if (!motionEnabled || !rotatingGroup.current) return;
+
+        rotatingGroup.current.rotation.y = (
+            rotatingGroup.current.rotation.y + delta * LOGO_ROTATION_SPEED
+        ) % (Math.PI * 2);
     });
 
     return (
         <group ref={rotatingGroup}>
-            {/* The GLB is authored in the XZ plane with its thin axis on Y. Turn
-                that face toward the camera while keeping world Y as the spin axis. */}
+            {/* This GLB's face is authored in the XZ plane, with its thin axis on Y. */}
             <group rotation={[Math.PI / 2, 0, 0]}>
-                <primitive object={object} scale={scale} position={offset} />
+                <primitive object={object} scale={scale} position={offset} dispose={null} />
             </group>
         </group>
     );
 }
 
 useGLTF.preload(jaLogoModel);
+
+class LogoErrorBoundary extends React.Component {
+    state = { hasError: false };
+
+    static getDerivedStateFromError() {
+        return { hasError: true };
+    }
+
+    componentDidCatch(error) {
+        console.error('Unable to load the homepage 3D logo:', error);
+    }
+
+    render() {
+        return this.state.hasError ? null : this.props.children;
+    }
+}
 
 const Home = () => {
     const { getText } = useContent();
@@ -63,10 +81,9 @@ const Home = () => {
     const [prefersReducedMotion, setPrefersReducedMotion] = useState(() => (
         typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
     ));
-    // The approved homepage image takes precedence over any older CMS bg_image value.
-    const currentBg = heroBackground;
+    const currentBg = '/images/home-architectural-background.png';
     const heroTitle = getText('home', 'hero_title', 'Ajidhas and Associates');
-    const heroSubtitle = getText('home', 'hero_subtitle', 'Art and Architecture Studio');
+    const heroSubtitle = getText('home', 'hero_subtitle', 'Architecture & Art Studio');
     const artBtnText = getText('home', 'art_button_text', 'Art');
     const archBtnText = getText('home', 'architecture_button_text', 'Architecture');
     const brandParts = String(heroTitle).split(/\s+(?:and|&)\s+/i);
@@ -107,13 +124,11 @@ const Home = () => {
         <div className="studio-home">
             <div className="studio-home__background" aria-hidden="true">
                 <img src={currentBg} alt="" />
-                <div className="studio-home__shade" />
             </div>
 
             <header className="studio-header">
                 <Link className="studio-header__brand" to="/" aria-label="Ajidhas Associates home">
-                    <span>AJIDHAS</span>
-                    <span>ASSOCIATES</span>
+                    <span>INDEX 01 / STUDIO</span>
                 </Link>
             </header>
 
@@ -136,21 +151,24 @@ const Home = () => {
             <main className="studio-hero">
                 <section className="studio-hero__identity" aria-label={`${brandName} ${associates}`}>
                     <div className="hero-emblem-media" aria-hidden="true">
-                        <Canvas
-                            className="hero-emblem-canvas"
-                            camera={{ position: [0, 0, 3.35], fov: 35 }}
-                            dpr={[1, 1.75]}
-                            gl={{ alpha: true, antialias: true, powerPreference: 'high-performance' }}
-                            frameloop={prefersReducedMotion ? 'demand' : 'always'}
-                        >
-                            <ambientLight intensity={1.25} />
-                            <directionalLight color="#fff1dc" intensity={3.2} position={[-2.5, 3.5, 4]} />
-                            <directionalLight color="#d28a4e" intensity={2} position={[3, 1.5, -2]} />
-                            <pointLight color="#ffe1bc" intensity={12} position={[0, 1.8, 2.5]} />
-                            <Suspense fallback={null}>
-                                <JaLogoModel motionEnabled={!prefersReducedMotion} />
-                            </Suspense>
-                        </Canvas>
+                        <LogoErrorBoundary>
+                            <Canvas
+                                className="hero-emblem-canvas"
+                                camera={{ position: [0, 0, 3.35], fov: 35 }}
+                                dpr={[1, 1.5]}
+                                gl={{ alpha: true, antialias: true, powerPreference: 'low-power' }}
+                                frameloop={prefersReducedMotion ? 'demand' : 'always'}
+                            >
+                                <ambientLight intensity={1.05} />
+                                <directionalLight color="#f5f2ed" intensity={1.6} position={[-2.5, 3.5, 4]} />
+                                <directionalLight color="#e8d9c8" intensity={0.65} position={[3, 1.5, -2]} />
+                                <Suspense fallback={null}>
+                                    <LogoErrorBoundary>
+                                        <JaLogoModel motionEnabled={!prefersReducedMotion} />
+                                    </LogoErrorBoundary>
+                                </Suspense>
+                            </Canvas>
+                        </LogoErrorBoundary>
                     </div>
 
                     <div className="hero-wordmark">
