@@ -1,0 +1,274 @@
+.collaboration-page {
+    width: 100%;
+    background-color: var(--color-deep-surface);
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+    perspective: 2000px;
+    /* Enhanced perspective for 3D text effects */
+}
+
+.collab-back-btn {
+    position: fixed;
+    top: 40px;
+    left: 40px;
+    z-index: 1000;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #fff;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    backdrop-filter: blur(10px);
+}
+
+.collab-back-btn:hover {
+    background: #fff;
+    color: var(--color-black);
+    transform: scale(1.1) rotate(-90deg);
+}
+
+.collab-hero-section {
+    width: 100%;
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform-style: preserve-3d;
+}
+
+/* Full Screen Background Layer */
+.collab-bg-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    overflow: hidden;
+}
+
+.collab-bg-image {
+    width: 110%;
+    /* Slightly wider for rotation room */
+    height: 140%;
+    /* Extra height for parallax and zoom */
+    object-fit: cover;
+    position: absolute;
+    top: -20%;
+    left: -5%;
+    will-change: transform, filter;
+    transition: filter 0.5s ease;
+}
+
+.bg-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom,
+            rgba(0, 0, 0, 0.3) 0%,
+            rgba(0, 0, 0, 0.4) 50%,
+            rgba(0, 0, 0, 0.9) 100%);
+    z-index: 2;
+    transition: background 0.8s ease;
+}
+
+/* Content Layer */
+.collab-content-layer {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    max-width: 1600px;
+    padding: 0 100px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    pointer-events: none;
+    padding-bottom: 12vh;
+    transform-style: preserve-3d;
+}
+
+.content-left {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    will-change: transform;
+}
+
+.collab-label-tag {
+    font-size: 0.75rem;
+    letter-spacing: 8px;
+    color: rgba(255, 255, 255, 0.5);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    display: block;
+    font-weight: 500;
+}
+
+.collab-hero-title {
+    font-size: 4.5rem;
+    font-weight: 900;
+    line-height: 0.8;
+    margin: 0;
+    text-transform: lowercase;
+    letter-spacing: -6px;
+    color: #fff;
+    text-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+}
+
+.title-char {
+    display: inline-block;
+    will-change: transform, opacity;
+}
+
+.collab-hero-subtitle {
+    font-size: 0.9rem;
+    letter-spacing: 15px;
+    color: rgba(255, 255, 255, 0.8);
+    text-transform: uppercase;
+    margin-top: 30px;
+    font-weight: 300;
+}
+
+.content-right {
+    flex: 0.3;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding-bottom: 10px;
+    will-change: transform;
+}
+
+.collab-hero-desc {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 40px;
+    max-width: 380px;
+    font-weight: 300;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.collab-more-btn {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    pointer-events: auto;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.more-line {
+    width: 50px;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.5);
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.collab-more-btn:hover .more-line {
+    width: 100px;
+    background: #fff;
+}
+
+.collab-more-btn:hover {
+    letter-spacing: 7px;
+    color: #fff;
+}
+
+/* Bottom UI */
+.collab-bottom-ui {
+    position: absolute;
+    bottom: 50px;
+    right: 100px;
+    z-index: 20;
+}
+
+.collab-scroll-hint {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+.hint-text {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.4);
+    letter-spacing: 3px;
+}
+
+.hint-line {
+    width: 1px;
+    height: 60px;
+    background: linear-gradient(to bottom, #fff, transparent);
+}
+
+@media (max-width: 1200px) {
+    .collab-content-layer {
+        padding: 0 60px;
+    }
+
+    .collab-bottom-ui {
+        right: 60px;
+    }
+}
+
+@media (max-width: 1024px) {
+    .collab-content-layer {
+        flex-direction: column;
+        padding: 0 40px;
+        text-align: center;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        padding-bottom: 0;
+    }
+
+    .content-left {
+        align-items: center;
+        margin-bottom: 50px;
+    }
+
+    .content-right {
+        text-align: center;
+        align-items: center;
+        flex: none;
+        width: 100%;
+    }
+
+    .collab-hero-title {
+        letter-spacing: -3px;
+        font-size: 3.5rem;
+        padding-top: 50%;
+    }
+
+    .collab-label-tag {
+        padding-top: 60%;
+    }
+
+    .collab-bottom-ui {
+        right: 50%;
+        transform: translateX(50%);
+        bottom: 30px;
+    }
+
+    .collab-hero-desc {
+        max-width: 100%;
+    }
+}

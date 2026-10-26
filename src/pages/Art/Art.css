@@ -1,0 +1,247 @@
+.art-page {
+    width: 100%;
+    min-height: 100vh;
+    position: relative;
+    color: var(--color-white);
+    background: var(--color-dark-charcoal);
+}
+
+.art-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+}
+
+.art-background .bg-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: blur(40px) brightness(0.3);
+    transition: opacity 0.9s ease-in-out, filter 0.9s ease-in-out;
+    opacity: 1;
+}
+
+.art-background .bg-image.current {
+    z-index: 1;
+    opacity: 0;
+}
+
+.art-background .bg-image.current.fade-in {
+    opacity: 1;
+}
+
+.art-background .bg-image.prev {
+    z-index: 2;
+    opacity: 1;
+}
+
+.art-background .bg-image.prev.fade-out {
+    opacity: 0;
+}
+
+.art-background .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.4) 100%);
+}
+
+.art-header-fixed {
+    position: fixed;
+    top: 2rem;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    z-index: 10;
+    pointer-events: none;
+}
+
+.art-header-fixed h1 {
+    font-size: 1.5rem;
+    font-weight: 300;
+    letter-spacing: 10px;
+    text-transform: uppercase;
+    margin: 0;
+    opacity: 0.6;
+}
+
+.art-project-section {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+    padding: 0 10%;
+}
+
+.art-content-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 6rem;
+    width: 100%;
+    max-width: 1400px;
+}
+
+.art-image-wrapper {
+    flex: 1.2;
+    height: 70vh;
+    overflow: hidden;
+    border-radius: 2px;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+}
+
+.art-image-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: opacity 0.9s ease, transform 0.9s ease;
+}
+
+.art-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.project-number {
+    font-size: 0.9rem;
+    font-weight: 300;
+    letter-spacing: 4px;
+    color: var(--color-stone-grey);
+    margin-bottom: 1rem;
+    display: block;
+}
+
+.art-info h3 {
+    font-size: clamp(2.5rem, 5vw, 4.5rem);
+    margin-bottom: 0.5rem;
+    font-weight: 300;
+    line-height: 1.1;
+    letter-spacing: -1px;
+}
+
+.art-info h4 {
+    font-size: 0.9rem;
+    color: var(--color-stone-grey);
+    margin-bottom: 2.5rem;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+}
+
+.description {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: var(--color-light-ash);
+    max-width: 450px;
+    font-weight: 300;
+}
+
+.art-contact {
+    margin-top: 4rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 2rem;
+    max-width: 450px;
+}
+
+.art-contact p {
+    font-size: 0.7rem;
+    color: var(--color-stone-grey);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.art-contact a {
+    font-size: 0.9rem;
+    color: var(--color-white);
+    text-decoration: none;
+    transition: color 0.3s ease;
+    letter-spacing: 1px;
+}
+
+.art-contact a:hover {
+    color: var(--color-sand-beige);
+}
+
+.scroll-hint-fixed {
+    position: fixed;
+    bottom: 3rem;
+    right: 3rem;
+    z-index: 10;
+    opacity: 0.5;
+}
+
+.mouse {
+    width: 20px;
+    height: 35px;
+    border: 1px solid var(--color-white);
+    border-radius: 10px;
+    position: relative;
+}
+
+.wheel {
+    width: 2px;
+    height: 6px;
+    background: var(--color-white);
+    border-radius: 1px;
+    position: absolute;
+    top: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    animation: scrollWheel 2s infinite;
+}
+
+@keyframes scrollWheel {
+    0% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(12px);
+    }
+}
+
+@media (max-width: 1024px) {
+    .art-content-wrapper {
+        flex-direction: column;
+        gap: 3rem;
+        text-align: center;
+    }
+
+    .art-image-wrapper {
+        width: 100%;
+        height: 40vh;
+        flex: none;
+    }
+
+    .art-details {
+        align-items: center;
+    }
+
+    .description {
+        max-width: 100%;
+    }
+
+    .art-contact {
+        max-width: 100%;
+        width: 100%;
+    }
+
+    .art-project-section {
+        padding: 0 5%;
+    }
+}

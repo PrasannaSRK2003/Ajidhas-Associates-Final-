@@ -1,0 +1,440 @@
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    padding: clamp(20px, 4vh, 30px) clamp(20px, 5vw, 60px);
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    color: var(--color-white);
+}
+
+/* Proper Scroll Effect */
+.navbar.scrolled {
+    padding: 15px clamp(20px, 5vw, 60px);
+    background:transparent;
+
+}
+
+.navbar:not(.scrolled) {
+    mix-blend-mode: difference;
+}
+
+.navbar.menu-open {
+    mix-blend-mode: normal !important;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    border-bottom: none !important;
+}
+
+.navbar-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1800px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.left-group {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+.back-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--color-white);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.back-button:hover {
+    background-color: #fff;
+    color: var(--color-black);
+    transform: translateX(-5px);
+}
+
+.logo a {
+    font-family: var(--font-heading);
+    font-size: 2.5rem;
+    font-weight: 1000;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--color-white);
+    text-decoration: none;
+    line-height: 1;
+    transition: opacity 0.3s ease;
+}
+
+.logo a:hover {
+    opacity: 0.7;
+}
+
+/* Professional Menu Toggle */
+.menu-toggle {
+    position: relative;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 1001;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.menu-toggle::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 50%;
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    transform: scale(0.8);
+    opacity: 0;
+}
+
+.menu-toggle:hover::before {
+    transform: scale(1);
+    opacity: 1;
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+.menu-toggle:active {
+    transform: scale(0.9);
+}
+
+.toggle-lines {
+    width: 22px;
+    height: 8px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.toggle-lines span {
+    display: block;
+    height: 1px;
+    background: #fff;
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.toggle-lines span:nth-child(1) {
+    width: 100%;
+}
+
+.toggle-lines span:nth-child(2) {
+    width: 65%;
+}
+
+.menu-toggle:hover .toggle-lines span:nth-child(2) {
+    width: 100%;
+}
+
+.menu-toggle.open .toggle-lines {
+    height: 2px;
+    justify-content: center;
+}
+
+.menu-toggle.open .toggle-lines span:nth-child(1) {
+    transform: rotate(45deg);
+    width: 100%;
+}
+
+.menu-toggle.open .toggle-lines span:nth-child(2) {
+    transform: rotate(-45deg);
+    width: 100%;
+    margin-top: -1px;
+}
+
+/* Menu Overlay */
+.menu-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #080808;
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+    clip-path: circle(0% at 100% 0);
+    padding: clamp(60px, 10vh, 100px) clamp(20px, 5vw, 80px) 40px;
+    overflow: hidden;
+}
+
+.menu-bg-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    pointer-events: none;
+}
+
+.menu-bg-image {
+    width: 100%;
+    height: 100%;
+}
+
+.menu-bg-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(0.25) grayscale(100%);
+    transition: opacity 0.8s ease, transform 1.2s ease;
+}
+
+.menu-grain {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("https://grainy-gradients.vercel.app/noise.svg");
+    opacity: 0.12;
+    pointer-events: none;
+}
+
+.menu-container {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1.5fr 0.5fr;
+    gap: 80px;
+    max-width: 1600px;
+    width: 100%;
+    margin: 0 auto;
+    position: relative;
+    z-index: 2;
+    align-items: center;
+}
+
+.menu-links {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.menu-link-wrapper {
+    display: flex;
+    align-items: baseline;
+    gap: 40px;
+    padding: 10px 0;
+}
+
+.menu-index {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.2);
+    letter-spacing: 4px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    transform: translateY(-10px);
+}
+
+.menu-link {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(4rem, 10vw, 9rem);
+    color: #fff;
+    text-transform: none;
+    font-weight: 400;
+    text-decoration: none;
+    line-height: 1;
+    transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    letter-spacing: -4px;
+    display: block;
+    overflow: hidden;
+}
+
+.link-text-wrapper {
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.link-text {
+    display: block;
+    height: 1em;
+    line-height: 1;
+}
+
+.hover-text {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.menu-link:hover .link-text-wrapper {
+    transform: translateY(-50%);
+}
+
+/* Side Section */
+.menu-side {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-left: 80px;
+    border-left: 1px solid rgba(255, 255, 255, 0.05);
+    height: 60%;
+}
+
+.menu-side-content {
+    display: flex;
+    flex-direction: column;
+    gap: 50px;
+}
+
+.side-label {
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 6px;
+    color: rgba(255, 255, 255, 0.3);
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+.side-links {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.side-links a {
+    font-size: 1.2rem;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 300;
+    transition: all 0.3s ease;
+    opacity: 0.6;
+}
+
+.side-links a:hover {
+    opacity: 1;
+    padding-left: 10px;
+}
+
+.side-value {
+    font-size: 1.1rem;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 300;
+    line-height: 1.6;
+    display: block;
+    opacity: 0.8;
+}
+
+.side-socials {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.side-socials a {
+    font-size: 1rem;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 300;
+    opacity: 0.6;
+    transition: all 0.3s ease;
+}
+
+.side-socials a:hover {
+    opacity: 1;
+    padding-left: 10px;
+}
+
+/* Bottom Section */
+.menu-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 40px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    max-width: 1600px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.menu-bottom p {
+    font-size: 0.65rem;
+    color: rgba(255, 255, 255, 0.2);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+}
+
+.scroll-indicator {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.scroll-indicator span {
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.indicator-line {
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.4), transparent);
+}
+
+@media (max-width: 1024px) {
+    .menu-container {
+        grid-template-columns: 1fr;
+        gap: 60px;
+    }
+
+    .menu-side {
+        border-left: none;
+        padding-left: 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        padding-top: 60px;
+        height: auto;
+    }
+
+    .menu-link {
+        font-size: 6rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .logo a {
+        font-size: 1.5rem;
+        flex-direction: row;
+        font-weight: 900;
+    }
+    .back-button {
+        width: 35px;
+        height: 35px;
+    }
+    .menu-link {
+        font-size: clamp(2.5rem, 8vw, 4rem);
+    }
+
+    .menu-bottom {
+        flex-direction: column;
+        gap: 20px;
+        text-align: center;
+    }
+}
+
+/* Pill-shaped navigation glass wrapper */
+.studio-header__links {
+    border-radius: 9999px !important;
+}

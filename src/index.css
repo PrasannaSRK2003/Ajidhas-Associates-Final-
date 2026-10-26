@@ -1,0 +1,211 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Manrope:wght@200;300;400;500;600&display=swap');
+
+:root {
+  /* Main Neutral Palette */
+  --color-dark-charcoal: #1F1F1E;
+  --color-deep-grey: #3A3A38;
+  --color-warm-grey: #6B6A66;
+  --color-stone-grey: #8E8C87;
+  --color-soft-grey: #B1B0AC;
+  --color-light-ash: #D6D4CF;
+  --color-off-white: #EFEDEA;
+
+  /* Earthy / Nature Tones */
+  --color-olive-grey: #7A7C6A;
+  --color-sand-beige: #D8CEC2;
+  --color-rock-taupe: #9A948C;
+
+  /* Pure Basics */
+  --color-white: #FFFFFF;
+  --color-black: #4A4A48;
+  --color-surface-grey: #565654;
+  --color-deep-surface: #353534;
+
+  /* Typography */
+  --font-main: 'Manrope', sans-serif;
+  --font-heading: 'Cormorant Garamond', serif;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-main);
+  background-color: var(--color-off-white);
+  color: var(--color-dark-charcoal);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* Hide native vertical scrollbar visually but keep scrolling functional */
+html,
+body {
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE 10+ */
+}
+
+body::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+/* While background is transitioning we hide native scrollbars to avoid flicker */
+.bg-transitioning {
+  overflow: hidden !important;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading);
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+/* Lenis Smooth Scroll */
+html.lenis {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
+}
+
+/* Professional Back Button Global Styles */
+.back-btn-prof {
+  background: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  z-index: 100;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.arrow-circle {
+  width: 50px;
+  height: 50px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 1.2rem;
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(10px);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+
+.arrow-circle::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border: 1px solid var(--color-sand-beige);
+  border-radius: 50%;
+  top: 0;
+  left: 0;
+  transform: scale(0.8);
+  opacity: 0;
+  transition: all 0.4s ease;
+}
+
+.back-btn-prof:hover .arrow-circle {
+  background: #fff;
+  color: var(--color-black);
+  border-color: #fff;
+  transform: scale(1.1);
+}
+
+.back-btn-prof:hover .arrow-circle::after {
+  transform: scale(1.3);
+  opacity: 0.3;
+}
+
+/* Page Specific Positioning */
+.gallery-3d-header {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.gallery-3d-header .back-btn-prof {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+}
+
+.preview-header-minimal {
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.detail-back {
+  position: fixed;
+  top: 40px;
+  left: 5%;
+}
+
+.artist-back {
+  margin-bottom: 40px;
+}
+
+@media (max-width: 768px) {
+  .arrow-circle {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+  }
+
+  .detail-back {
+    top: 20px;
+    left: 20px;
+  }
+
+  .gallery-3d-header .back-btn-prof {
+    position: relative;
+    top: 0;
+    transform: none;
+    margin-bottom: 20px;
+  }
+}

@@ -1,0 +1,378 @@
+.about-v2-container {
+    width: 100%;
+    height: 100vh;
+    background: linear-gradient(180deg, #FBF9F5 0%, #F5EFE6 100%);
+    color: var(--color-dark-charcoal);
+    overflow: hidden;
+    position: relative;
+    font-family: 'Manrope', sans-serif;
+}
+
+.about-v2-content {
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+
+/* Left Side Styling */
+.about-v2-left {
+    width: 40%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    padding: 0 5% 0 8%;
+    position: relative;
+    z-index: 100;
+    background: linear-gradient(to right, #FBF9F5 85%, transparent);
+}
+
+.member-info-content {
+    max-width: 500px;
+}
+
+.member-role-tag {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 5px;
+    color: #8B5A2B;
+    font-weight: 700;
+    margin-bottom: 20px;
+    display: block;
+}
+
+.member-name-title {
+    font-size: 4.5rem;
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 400;
+    line-height: 1;
+    margin-bottom: 40px;
+    letter-spacing: -2px;
+    color: var(--color-dark-charcoal);
+}
+
+.member-bio-container {
+    margin-bottom: 60px;
+    position: relative;
+}
+
+.member-bio-text {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: var(--color-deep-grey);
+    font-weight: 400;
+}
+
+.member-nav-controls {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+.nav-btn {
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid rgba(31, 31, 30, 0.2);
+    color: var(--color-dark-charcoal);
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.nav-btn:hover {
+    background: #1F1F1E;
+    color: #ffffff;
+    border-color: #1F1F1E;
+    transform: scale(1.1);
+}
+
+.nav-counter {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 2px;
+}
+
+.nav-counter .current {
+    color: var(--color-dark-charcoal);
+}
+
+.nav-counter .separator {
+    color: #8B5A2B;
+}
+
+.nav-counter .total {
+    color: #8B5A2B;
+    opacity: 0.7;
+}
+
+/* Right Side Styling - Circular Rotation */
+.about-v2-right {
+    width: 60%;
+    height: 100%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    perspective: 2000px;
+    overflow: visible;
+}
+
+.team-circular-ring {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.team-member-card-3d {
+    position: absolute;
+    width: 350px;
+    height: 400px;
+    transform-style: preserve-3d;
+    cursor: pointer;
+}
+
+.member-image-wrapper {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.1), 0 10px 25px rgba(0, 0, 0, 0.05);
+    border-radius: 400px 400px 10px 10px; /* Professional Arch Shape */
+    transform-style: preserve-3d;
+    border: 1px solid rgba(31, 31, 30, 0.12);
+    background: #FAF8F5;
+    transition: box-shadow 0.6s ease;
+}
+
+.team-member-card-3d.active .member-image-wrapper {
+    box-shadow: 0 40px 90px rgba(0, 0, 0, 0.15), 0 0 30px rgba(139, 90, 43, 0.15);
+}
+
+.member-main-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale(10%) brightness(0.95);
+    transition: filter 0.6s ease;
+}
+
+.team-member-card-3d.active .member-main-img {
+    filter: grayscale(0%) brightness(1);
+}
+
+.image-overlay-gradient {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.3) 0%, transparent 40%);
+}
+
+.bg-text-overlay {
+    position: absolute;
+    top: 50%;
+    right: -5%;
+    transform: translateY(-50%);
+    z-index: -1;
+    pointer-events: none;
+}
+
+.bg-text-overlay span {
+    font-size: 15vw;
+    font-weight: 900;
+    color: rgba(139, 90, 43, 0.06);
+    text-transform: uppercase;
+    white-space: nowrap;
+    font-family: 'Inter', sans-serif;
+}
+
+/* Progress Bar */
+.about-progress-container {
+    position: absolute;
+    bottom: 60px;
+    left: 8%;
+    display: flex;
+    gap: 15px;
+    z-index: 200;
+}
+
+.progress-dot {
+    width: 60px;
+    height: 2px;
+    background: rgba(31, 31, 30, 0.15);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s ease;
+}
+
+.progress-dot.active {
+    background: rgba(139, 90, 43, 0.3);
+    width: 100px;
+}
+
+.progress-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0%;
+    height: 100%;
+    background: #8B5A2B;
+}
+
+.progress-dot.active .progress-fill {
+    /* No animation here as we handle rotation manually/auto with requestAnimationFrame */
+    width: 100%;
+}
+
+.member-info-content > * {
+    will-change: transform, opacity, filter;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 1200px) {
+    .team-member-card-3d {
+        width: 300px;
+        height: 420px;
+    }
+}
+
+@media (max-width: 1024px) {
+    .about-v2-container {
+        height: auto;
+        min-height: 100vh;
+        padding-bottom: 60px;
+        overflow-y: auto;
+    }
+
+    .about-v2-content {
+        flex-direction: column;
+        height: auto;
+        min-height: 100vh;
+    }
+
+    .about-v2-left {
+        width: 100%;
+        height: auto;
+        min-height: 40vh;
+        padding: 90px 6% 30px;
+        background: linear-gradient(180deg, #FBF9F5 0%, #F5EFE6 100%);
+    }
+
+    .about-v2-right {
+        width: 100%;
+        height: 50vh;
+        min-height: 380px;
+        perspective: 1400px;
+    }
+
+    .team-member-card-3d {
+        width: 250px;
+        height: 340px;
+    }
+
+    .member-name-title {
+        font-size: 3.2rem;
+        margin-bottom: 25px;
+    }
+
+    .bg-text-overlay {
+        display: none;
+    }
+
+    .about-progress-container {
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+}
+
+@media (max-width: 768px) {
+    .about-v2-left {
+        padding: 85px 24px 20px;
+    }
+
+    .member-role-tag {
+        font-size: 0.65rem;
+        letter-spacing: 4px;
+        margin-bottom: 12px;
+        margin-top: 0;
+    }
+
+    .member-name-title {
+        font-size: 2.4rem;
+        letter-spacing: -1px;
+        margin-bottom: 20px;
+    }
+
+    .member-bio-text {
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
+
+    .member-bio-container {
+        margin-bottom: 30px;
+    }
+
+    .member-nav-controls {
+        gap: 15px;
+    }
+
+    .nav-btn {
+        width: 44px;
+        height: 44px;
+        font-size: 1.1rem;
+    }
+
+    .about-v2-right {
+        height: 45vh;
+        min-height: 330px;
+        perspective: 1000px;
+    }
+
+    .team-member-card-3d {
+        width: 200px;
+        height: 270px;
+    }
+}
+
+@media (max-width: 480px) {
+    .about-v2-left {
+        padding: 80px 18px 15px;
+    }
+
+    .member-name-title {
+        font-size: 2rem;
+    }
+
+    .about-v2-right {
+        height: 40vh;
+        min-height: 290px;
+    }
+
+    .team-member-card-3d {
+        width: 165px;
+        height: 230px;
+    }
+
+    .progress-dot {
+        width: 40px;
+    }
+
+    .progress-dot.active {
+        width: 70px;
+    }
+}

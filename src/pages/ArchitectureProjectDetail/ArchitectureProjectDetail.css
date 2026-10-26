@@ -1,0 +1,237 @@
+.arch-project-detail-container {
+    width: 100%;
+    background: var(--color-deep-surface);
+    color: #fff;
+    min-height: 100vh;
+}
+
+.arch-detail-hero {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.arch-detail-hero-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+.arch-detail-hero-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.arch-detail-hero-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    max-width: 900px;
+    padding: 0 20px;
+}
+
+.arch-detail-coords {
+    font-size: 0.7rem;
+    letter-spacing: 5px;
+    color: var(--color-sand-beige);
+    margin-bottom: 20px;
+    text-transform: uppercase;
+}
+
+.arch-detail-title {
+    font-size: clamp(3rem, 10vw, 8rem);
+    font-weight: 700;
+    letter-spacing: -4px;
+    text-transform: lowercase;
+    line-height: 0.9;
+    margin-bottom: 30px;
+}
+
+.arch-detail-quick-meta {
+    font-size: 0.9rem;
+    letter-spacing: 2px;
+    color: #888;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+}
+
+.separator {
+    color: #444;
+}
+
+/* Info Section */
+.arch-detail-info-section {
+    padding: 120px clamp(20px, 10vw, 150px);
+    background: var(--color-deep-surface);
+}
+
+.arch-detail-info-grid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 100px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.arch-detail-description h2 {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    color: #444;
+    margin-bottom: 30px;
+}
+
+.arch-detail-description p {
+    font-size: 1.4rem;
+    line-height: 1.6;
+    color: #ccc;
+    font-weight: 300;
+}
+
+.arch-detail-specs {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+.spec-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+.spec-item svg {
+    font-size: 1.5rem;
+    color: var(--color-sand-beige);
+    margin-top: 5px;
+}
+
+.spec-item span {
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: #444;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.spec-item p {
+    font-size: 1rem;
+    color: #fff;
+    letter-spacing: 1px;
+}
+
+/* Gallery Section */
+.arch-detail-gallery {
+    padding: 120px clamp(20px, 10vw, 150px);
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    margin-bottom: 80px;
+}
+
+.section-number {
+    font-size: 0.7rem;
+    color: #444;
+    letter-spacing: 2px;
+}
+
+.section-title {
+    font-size: 1.5rem;
+    font-weight: 400;
+    text-transform: lowercase;
+    letter-spacing: -1px;
+}
+
+.section-line {
+    flex: 1;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.arch-detail-gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 40px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.arch-detail-gallery-item {
+    aspect-ratio: 4/5;
+    overflow: hidden;
+    background: var(--color-surface-grey);
+}
+
+.arch-detail-gallery-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 1s ease;
+}
+
+.arch-detail-gallery-item:hover img {
+    transform: scale(1.05);
+}
+
+/* Footer */
+.arch-detail-footer {
+    padding: 150px clamp(20px, 10vw, 150px);
+    text-align: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.footer-content p {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 5px;
+    color: #444;
+    margin-bottom: 20px;
+}
+
+.footer-content h2 {
+    font-size: clamp(2rem, 6vw, 4rem);
+    font-weight: 600;
+    text-transform: lowercase;
+    letter-spacing: -2px;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.footer-content h2:hover {
+    color: var(--color-sand-beige);
+}
+
+@media (max-width: 1024px) {
+    .arch-detail-info-grid {
+        grid-template-columns: 1fr;
+        gap: 60px;
+    }
+}
+
+@media (max-width: 768px) {
+    .arch-detail-gallery-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .arch-detail-description p {
+        font-size: 1.1rem;
+    }
+
+    .arch-detail-title {
+        font-size: 3.5rem;
+    }
+}

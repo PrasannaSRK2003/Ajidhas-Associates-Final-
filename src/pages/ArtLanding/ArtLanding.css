@@ -1,0 +1,311 @@
+.art-landing-page-new {
+    width: 100%;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+    background: #FAF8F5;
+}
+
+/* Cover Slide */
+.cover-slide {
+    width: 100%;
+    height: 100vh;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cover-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+}
+
+.cover-background img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(0.95) saturate(1.15) contrast(1.05);
+    animation: kenBurns 20s ease-in-out infinite alternate;
+}
+
+@keyframes kenBurns {
+    0% {
+        transform: scale(1);
+    }
+
+    100% {
+        transform: scale(1.08);
+    }
+}
+
+.cover-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at center, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.5) 100%);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    pointer-events: none;
+}
+
+.cover-content {
+    position: relative;
+    z-index: 1;
+    max-width: 1000px;
+    width: 90%;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    color: #FFFFFF;
+    padding-top: clamp(70px, 11vh, 120px);
+}
+
+/* Header Section */
+.cover-header {
+    text-align: center;
+}
+
+.cover-label {
+    display: inline-block;
+    font-size: 0.75rem;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: #D4AF37;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+}
+
+.cover-title {
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-weight: 500;
+    line-height: 1.1;
+    margin-bottom: 0.5rem;
+    letter-spacing: -1px;
+    color: #FFFFFF;
+    text-shadow: 0 4px 25px rgba(0, 0, 0, 0.8), 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.cover-subtitle {
+    font-size: clamp(0.85rem, 1.5vw, 1rem);
+    color: #FAF8F5;
+    font-weight: 400;
+    letter-spacing: 1px;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.7);
+    opacity: 0.95;
+}
+
+/* Featured Work */
+.featured-work {
+    text-align: center;
+    padding: 1.5rem 2rem;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 4px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+}
+
+.work-badge {
+    display: inline-block;
+    padding: 0.4rem 1.2rem;
+    background: rgba(212, 175, 55, 0.2);
+    border: 1px solid rgba(212, 175, 55, 0.5);
+    color: #F3E5AB;
+    font-size: 0.65rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.work-title {
+    font-size: clamp(1.5rem, 3vw, 2.5rem);
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.5px;
+    color: #FFFFFF;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
+}
+
+.work-meta {
+    font-size: clamp(0.8rem, 1.5vw, 0.95rem);
+    color: #E0E0E0;
+    font-weight: 400;
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
+}
+
+/* Action Buttons */
+.cover-actions {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.cover-btn {
+    position: relative;
+    padding: 1rem 2.5rem;
+    font-family: var(--font-main);
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    overflow: hidden;
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    border: none;
+    min-width: 200px;
+    justify-content: center;
+}
+
+.cover-btn.primary {
+    background: var(--color-dark-charcoal);
+    color: var(--color-white);
+}
+
+.cover-btn.primary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: #8B5A2B;
+    transition: left 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 0;
+}
+
+.cover-btn.primary:hover::before {
+    left: 0;
+}
+
+.cover-btn.primary:hover {
+    color: var(--color-white);
+}
+
+.cover-btn.secondary {
+    background: rgba(255, 255, 255, 0.85);
+    color: var(--color-dark-charcoal);
+    border: 1px solid rgba(31, 31, 30, 0.2);
+}
+
+.cover-btn.secondary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: rgba(31, 31, 30, 0.08);
+    transition: left 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 0;
+}
+
+.cover-btn.secondary:hover::before {
+    left: 0;
+}
+
+.cover-btn.secondary:hover {
+    border-color: var(--color-dark-charcoal);
+}
+
+.cover-btn span,
+.cover-btn svg {
+    position: relative;
+    z-index: 1;
+}
+
+.cover-btn svg {
+    transition: transform 0.3s ease;
+}
+
+.cover-btn:hover svg {
+    transform: translateX(5px);
+}
+
+/* Slide Progress */
+.slide-progress {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 0.5rem;
+}
+
+.progress-bar {
+    width: 70px;
+    height: 2px;
+    background: rgba(31, 31, 30, 0.15);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.progress-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 0;
+    background: var(--color-dark-charcoal);
+    transition: width 0.3s ease;
+}
+
+.progress-bar.active .progress-fill {
+    animation: fillProgress 4s linear forwards;
+}
+
+.progress-bar.completed .progress-fill {
+    width: 100%;
+}
+
+@keyframes fillProgress {
+    0% {
+        width: 0;
+    }
+
+    100% {
+        width: 100%;
+    }
+}
+
+.progress-bar:hover {
+    background: rgba(31, 31, 30, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .cover-content {
+        gap: 1.5rem;
+    }
+
+    .featured-work {
+        padding: 1.2rem 1.5rem;
+    }
+
+    .cover-actions {
+        flex-direction: column;
+        width: 100%;
+        max-width: 280px;
+        margin: 0 auto;
+    }
+
+    .cover-btn {
+        width: 100%;
+        padding: 0.9rem 2rem;
+        font-size: 0.8rem;
+    }
+
+    .progress-bar {
+        width: 50px;
+    }
+}

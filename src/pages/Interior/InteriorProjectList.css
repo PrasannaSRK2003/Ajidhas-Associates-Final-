@@ -1,0 +1,249 @@
+.ipl-container {
+    width: 100%;
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+    background-color: var(--color-deep-surface);
+    font-family: 'Inter', sans-serif;
+}
+
+/* Intro Layer */
+.intro-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    /* Let clicks pass through after animation */
+}
+
+.intro-layer.hidden {
+    /* We don't hide it completely with display:none because the center image becomes the bg visually */
+    /* But in this implementation, we swap to the main layer bg, so we can hide this layer or let it fade out */
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    pointer-events: none;
+}
+
+.intro-container {
+    display: flex;
+    gap: 40px;
+    /* Initial gap */
+    align-items: center;
+    justify-content: center;
+}
+
+.intro-img-box {
+    width: 150px;
+    height: 200px;
+    overflow: hidden;
+    position: relative;
+    transform-origin: center;
+}
+
+.intro-img-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale(100%);
+}
+
+.intro-img-box.center-img {
+    z-index: 10;
+}
+
+/* Main Layer */
+.ipl-main-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+}
+
+.ipl-bg-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+}
+
+.ipl-bg-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: opacity 0.5s ease;
+}
+
+.ipl-bg-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to right, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.8));
+    z-index: 1;
+}
+
+/* New Layout Styles */
+.ipl-content-wrapper.new-layout {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 0 10%;
+    height: 100%;
+    position: relative;
+    z-index: 10;
+}
+
+.hero-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 1rem 0;
+    position: relative;
+}
+
+.hero-text.large {
+    font-size: clamp(3rem, 6vw, 7rem);
+    font-weight: 500;
+    color: #fff;
+    line-height: 1;
+    letter-spacing: -2px;
+}
+
+.hero-text.serif {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 4vw, 4rem);
+    font-style: italic;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.hero-icon-wrapper {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.sun-icon {
+    font-size: 3rem;
+    color: #fff;
+    animation: spin 10s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.hero-divider {
+    width: 100%;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.3);
+    margin: 1rem 0;
+}
+
+.hero-desc-wrapper {
+    flex: 1;
+    padding: 0 2rem;
+    display: flex;
+    justify-content: flex-start;
+}
+
+.hero-desc-wrapper p {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.4;
+    text-align: left;
+    max-width: 250px;
+}
+
+.explore-btn {
+    padding: 10px 30px;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 30px;
+    background: transparent;
+    color: #fff;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Inter', sans-serif;
+}
+
+.explore-btn:hover {
+    background: #fff;
+    color: var(--color-black);
+    border-color: #fff;
+}
+
+/* Row specific adjustments */
+.row-1 {
+    justify-content: space-between;
+}
+
+.row-2 {
+    justify-content: space-between;
+}
+
+.row-3 {
+    justify-content: space-between;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .ipl-content-wrapper.new-layout {
+        padding: 0 5%;
+    }
+
+    .hero-text.large {
+        font-size: 3.5rem;
+    }
+
+    .hero-text.serif {
+        font-size: 2.5rem;
+    }
+
+    .hero-desc-wrapper {
+        display: none;
+        /* Hide description on smaller screens to save space */
+    }
+
+    .sun-icon {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .hero-row {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+        text-align: center;
+    }
+
+    .hero-text.large {
+        font-size: 2.5rem;
+    }
+
+    .hero-divider {
+        margin: 0.5rem 0;
+    }
+}

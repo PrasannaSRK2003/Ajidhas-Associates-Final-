@@ -1,0 +1,255 @@
+.arch-projects-editorial {
+    width: 100%;
+    background: var(--color-deep-surface);
+}
+
+.project-editorial-section {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.editorial-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+}
+
+.editorial-bg img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(0.6);
+}
+
+.editorial-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom,
+            rgba(0, 0, 0, 0.4) 0%,
+            transparent 30%,
+            transparent 70%,
+            rgba(0, 0, 0, 0.6) 100%);
+}
+
+.editorial-content {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: clamp(40px, 6vw, 100px);
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto 1fr auto;
+    color: #fff;
+}
+
+.editorial-top-left {
+    grid-column: 1;
+    grid-row: 1;
+}
+
+.coords {
+    font-size: 0.8rem;
+    letter-spacing: 3px;
+    font-weight: 300;
+    opacity: 0.7;
+    font-family: var(--font-main);
+}
+
+.editorial-top-right {
+    grid-column: 2;
+    grid-row: 1;
+    text-align: right;
+}
+
+.location-year {
+    font-size: 0.8rem;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    font-weight: 400;
+    opacity: 0.8;
+}
+
+.editorial-center-right {
+    grid-column: 2;
+    grid-row: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: center;
+    margin-top: -10vh;
+}
+
+.editorial-title {
+    font-family: var(--font-main);
+    font-size: 2rem;
+    /* Changed from clamp(4rem, 12vw, 9rem) to 2rem */
+    font-weight: 600;
+    line-height: 0.85;
+    text-align: right;
+    letter-spacing: -1px;
+    /* Adjusted letter spacing for smaller size */
+    text-transform: lowercase;
+    margin-bottom: 20px;
+}
+
+.editorial-bottom-right {
+    grid-column: 2;
+    grid-row: 3;
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+}
+
+.editorial-description {
+    max-width: 450px;
+    font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+    line-height: 1.5;
+    font-weight: 300;
+    text-align: right;
+    opacity: 0.8;
+    letter-spacing: 0.5px;
+}
+
+.editorial-bottom-left {
+    grid-column: 1;
+    grid-row: 3;
+    display: flex;
+    align-items: flex-end;
+}
+
+.designer-info {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.designer-icon {
+    width: 35px;
+    height: 35px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background-image: url('https://api.dicebear.com/7.x/avataaars/svg?seed=Felix');
+    background-size: cover;
+}
+
+.designer-info p {
+    font-size: 0.7rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-weight: 500;
+    opacity: 0.6;
+}
+
+@media (max-width: 1024px) {
+    .editorial-content {
+        padding: 60px;
+    }
+
+    .editorial-title {
+        font-size: 2rem;
+        /* Consistent size */
+    }
+}
+
+@media (max-width: 768px) {
+    .editorial-content {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto 1fr auto auto;
+        padding: 40px 30px;
+        gap: 30px;
+    }
+
+    .editorial-top-right {
+        grid-column: 1;
+        grid-row: 2;
+        text-align: left;
+    }
+
+    .editorial-center-right {
+        grid-column: 1;
+        grid-row: 3;
+        align-items: flex-start;
+        margin-top: 0;
+    }
+
+    .editorial-title {
+        text-align: left;
+        font-size: 2rem;
+        /* Consistent size */
+        letter-spacing: -1px;
+    }
+
+    .editorial-bottom-right {
+        grid-column: 1;
+        grid-row: 4;
+        justify-content: flex-start;
+    }
+
+    .editorial-description {
+        text-align: left;
+        max-width: 100%;
+    }
+
+    .editorial-bottom-left {
+        grid-column: 1;
+        grid-row: 5;
+    }
+}
+
+/* Alternating Layout for Even Items (Left Aligned) */
+.layout-left .editorial-center-right {
+    grid-column: 1;
+    align-items: flex-start;
+}
+
+.layout-left .editorial-title {
+    text-align: left;
+}
+
+.layout-left .editorial-bottom-right {
+    grid-column: 1;
+    justify-content: flex-start;
+    text-align: left;
+}
+
+.layout-left .editorial-description {
+    text-align: left;
+}
+
+.layout-left .editorial-bottom-left {
+    grid-column: 2;
+    justify-content: flex-end;
+}
+
+/* Ensure mobile styles override these if necessary */
+@media (max-width: 768px) {
+    .layout-left .editorial-center-right {
+        grid-column: 1;
+        align-items: flex-start;
+    }
+
+    .layout-left .editorial-bottom-right {
+        grid-column: 1;
+    }
+
+    .layout-left .editorial-bottom-left {
+        grid-column: 1;
+        justify-content: flex-start;
+    }
+    .coords{padding-top: 1.8rem;}
+}
