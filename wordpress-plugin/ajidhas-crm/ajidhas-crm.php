@@ -74,6 +74,23 @@ class Ajidhas_CRM_Content_Manager {
     }
 
     /**
+     * Default gallery copy and images. These seed only new records and the
+     * original untouched placeholders; saved images can still be replaced in WP Media.
+     */
+    private function get_default_gallery_items() {
+        $asset_url = plugin_dir_url(__FILE__) . 'assets/';
+
+        return array(
+            array('title' => 'Fragmented Forms', 'label' => 'Series 01', 'image' => $asset_url . 'gallery-artwork-01.png'),
+            array('title' => 'Terra No. 03', 'label' => 'Series 02', 'image' => $asset_url . 'gallery-artwork-02.png'),
+            array('title' => 'Silent Geometry', 'label' => 'Series 03', 'image' => $asset_url . 'gallery-artwork-03.png'),
+            array('title' => 'Material Echoes', 'label' => 'Series 04', 'image' => $asset_url . 'gallery-artwork-01.png'),
+            array('title' => 'Organic Composition', 'label' => 'Series 05', 'image' => $asset_url . 'gallery-artwork-02.png'),
+            array('title' => 'Layers of Time', 'label' => 'Series 06', 'image' => $asset_url . 'gallery-artwork-03.png'),
+        );
+    }
+
+    /**
      * Get Default Content Structure for All Sections
      */
     public function get_default_content() {
@@ -148,14 +165,7 @@ class Ajidhas_CRM_Content_Manager {
                 'header_label' => 'Gallery',
                 'header_title' => 'Artistic Series',
                 'footer_hint' => 'Scroll to explore',
-                'items' => array(
-                    array('title' => 'Hatha Yoga', 'label' => 'Series 01', 'image' => ''),
-                    array('title' => 'Vinyasa Yoga', 'label' => 'Series 02', 'image' => ''),
-                    array('title' => 'Ashtanga Yoga', 'label' => 'Series 03', 'image' => ''),
-                    array('title' => 'Yin Yoga', 'label' => 'Series 04', 'image' => ''),
-                    array('title' => 'Kundalini Yoga', 'label' => 'Series 05', 'image' => ''),
-                    array('title' => 'Restorative Yoga', 'label' => 'Series 06', 'image' => ''),
-                )
+                'items' => $this->get_default_gallery_items()
             ),
             'architecture_all' => array(
                 'header_title' => 'ALL WORK',
@@ -324,6 +334,39 @@ class Ajidhas_CRM_Content_Manager {
             } else {
                 $stored[$section_key] = wp_parse_args($stored[$section_key], $section_defaults);
             }
+        }
+
+        // Update only the original placeholder titles. Existing custom titles and
+        // non-empty images remain untouched, and no saved option is rewritten here.
+        if (isset($stored['gallery']['items']) && is_array($stored['gallery']['items'])) {
+            $legacy_titles = array(
+                'Hatha Yoga' => 'Fragmented Forms',
+                'Vinyasa Yoga' => 'Terra No. 03',
+                'Ashtanga Yoga' => 'Silent Geometry',
+                'Yin Yoga' => 'Material Echoes',
+                'Kundalini Yoga' => 'Organic Composition',
+                'Restorative Yoga' => 'Layers of Time',
+            );
+            $default_gallery_items = $this->get_default_gallery_items();
+            $placeholder_image_urls = array();
+            foreach ($default_gallery_items as $default_gallery_item) {
+                $placeholder_image_urls[] = $default_gallery_item['image'];
+            }
+            foreach ($stored['gallery']['items'] as $index => &$gallery_item) {
+                if (!is_array($gallery_item)) {
+                    continue;
+                }
+                $old_title = isset($gallery_item['title']) ? $gallery_item['title'] : '';
+                if (isset($legacy_titles[$old_title])) {
+                    $gallery_item['title'] = $legacy_titles[$old_title];
+                }
+                if (empty($gallery_item['image']) && count($default_gallery_items)) {
+                    $fallback_index = is_numeric($index) ? ((int) $index % count($default_gallery_items)) : 0;
+                    $gallery_item['image'] = $default_gallery_items[$fallback_index]['image'];
+                }
+                $gallery_item['image_is_placeholder'] = empty($gallery_item['image']) || in_array($gallery_item['image'], $placeholder_image_urls, true);
+            }
+            unset($gallery_item);
         }
         return $stored;
     }
@@ -878,14 +921,7 @@ class Ajidhas_CRM_Content_Manager {
 
                     <div id="gallery-items-container">
                         <?php
-                        $default_gallery_items = array(
-                            array('title' => 'Hatha Yoga', 'label' => 'Series 01', 'image' => ''),
-                            array('title' => 'Vinyasa Yoga', 'label' => 'Series 02', 'image' => ''),
-                            array('title' => 'Ashtanga Yoga', 'label' => 'Series 03', 'image' => ''),
-                            array('title' => 'Yin Yoga', 'label' => 'Series 04', 'image' => ''),
-                            array('title' => 'Kundalini Yoga', 'label' => 'Series 05', 'image' => ''),
-                            array('title' => 'Restorative Yoga', 'label' => 'Series 06', 'image' => ''),
-                        );
+                        $default_gallery_items = $this->get_default_gallery_items();
                         $gallery_items = !empty($content['gallery']['items']) && is_array($content['gallery']['items']) ? $content['gallery']['items'] : $default_gallery_items;
                         foreach ($gallery_items as $index => $item) :
                             $item_title = $item['title'] ?? '';
@@ -909,7 +945,7 @@ class Ajidhas_CRM_Content_Manager {
                                 </div>
                                 <div class="form-row" style="margin-top: 12px; margin-bottom: 0;">
                                     <label>Series Image</label>
-                                    <input type="text" id="gallery_item_img_<?php echo $index; ?>" name="ajidhas_content[gallery][items][<?php echo $index; ?>][image]" value="<?php echo esc_url($item_img); ?>" placeholder="Leave empty to use default local artwork image" />
+                                    <input type="text" id="gallery_item_img_<?php echo $index; ?>" name="ajidhas_content[gallery][items][<?php echo $index; ?>][image]" value="<?php echo esc_url($item_img); ?>" placeholder="Choose an artwork from the WordPress Media Library" />
                                     <button type="button" class="upload-btn" onclick="selectMedia('gallery_item_img_<?php echo $index; ?>', 'gallery_item_preview_<?php echo $index; ?>')">Choose Image</button>
                                     <button type="button" class="clear-btn" onclick="clearMedia('gallery_item_img_<?php echo $index; ?>', 'gallery_item_preview_<?php echo $index; ?>')">Clear</button>
                                     <img id="gallery_item_preview_<?php echo $index; ?>" class="img-preview" src="<?php echo esc_url($item_img); ?>" style="<?php echo empty($item_img) ? 'display:none;' : ''; ?>" />
@@ -1607,13 +1643,13 @@ class Ajidhas_CRM_Content_Manager {
             var html = `
                 <div class="gallery-item-card" style="background: #f8fafc; border: 1px solid #cbd5e1; padding: 16px; border-radius: 8px; margin-bottom: 16px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                        <h4 style="margin: 0; color: #0f172a;">Series Item #<span class="gallery-item-index">${count + 1}</span>: <span class="gallery-item-title-preview">New Series Item</span></h4>
+                        <h4 style="margin: 0; color: #0f172a;">Series Item #<span class="gallery-item-index">${count + 1}</span>: <span class="gallery-item-title-preview">New Artwork</span></h4>
                         <button type="button" class="clear-btn" onclick="removeGalleryItem(this)">🗑️ Delete Series Item</button>
                     </div>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                         <div class="form-row" style="margin-bottom: 0;">
                             <label>Title</label>
-                            <input type="text" name="ajidhas_content[gallery][items][${index}][title]" value="" placeholder="e.g. Hatha Yoga" oninput="this.closest('.gallery-item-card').querySelector('.gallery-item-title-preview').innerText = this.value || 'Untitled Series'" />
+                            <input type="text" name="ajidhas_content[gallery][items][${index}][title]" value="" placeholder="e.g. Fragmented Forms" oninput="this.closest('.gallery-item-card').querySelector('.gallery-item-title-preview').innerText = this.value || 'Untitled Series'" />
                         </div>
                         <div class="form-row" style="margin-bottom: 0;">
                             <label>Label / Series Badge</label>

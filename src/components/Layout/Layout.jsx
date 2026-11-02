@@ -8,6 +8,8 @@ import './Layout.css';
 const Layout = ({ children }) => {
     const location = useLocation();
     const isHomePage = location.pathname === '/';
+    const isArtLandingPage = location.pathname === '/art';
+    const isGalleryPage = location.pathname === '/art/gallery';
 
     const isLandscapePage = location.pathname.startsWith('/architecture/landscape');
 
@@ -15,11 +17,11 @@ const Layout = ({ children }) => {
 
     return (
         <div className="layout-wrapper">
-            {!isHomePage && !isLandscapePage && <Navbar />}
+            {!isHomePage && !isLandscapePage && !isArtLandingPage && !isGalleryPage && <Navbar />}
             <main className="main-content">
                 {children}
             </main>
-            {!isHomePage && <Footer />}
+            {!isHomePage && !isArtLandingPage && <Footer />}
         </div>
     );
 };

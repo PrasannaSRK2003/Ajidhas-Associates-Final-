@@ -1,161 +1,107 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { gsap } from 'gsap';
-import { IoArrowForward } from 'react-icons/io5';
+﻿import React, { useEffect, useRef, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useContent } from '../../context/useContent';
 import './ArtLanding.css';
 
-import art1 from '../../assets/art_1.png';
-import art2 from '../../assets/art_2.png';
-import art3 from '../../assets/art_3.png';
-
-const defaultWorks = [
-    {
-        id: 1,
-        title: 'Ethereal Silence',
-        artist: 'Ajidhas',
-        year: '2025',
-        medium: 'Mixed Media on Canvas',
-        image: art1,
-    },
-    {
-        id: 2,
-        title: 'Bronze Form No. 4',
-        artist: 'Ajidhas',
-        year: '2024',
-        medium: 'Bronze Sculpture',
-        image: art2,
-    },
-    {
-        id: 3,
-        title: 'Monolith',
-        artist: 'Ajidhas',
-        year: '2025',
-        medium: 'Photography',
-        image: art3,
-    },
-];
-
 const ArtLanding = () => {
     const navigate = useNavigate();
-    const { getText, getImage, wpContent } = useContent();
-
-    const headerLabel = getText('art', 'header_label', 'Art Collection');
-    const headerTitle = getText('art', 'header_title', 'Ajidhas & Associates');
-    const headerSubtitle = getText('art', 'header_subtitle', 'Curated works from visionary artists');
-
-    const recentWorks = (wpContent?.art?.items && Array.isArray(wpContent.art.items) && wpContent.art.items.length > 0)
-        ? wpContent.art.items.map((item, idx) => ({
-            id: item.id || idx + 1,
-            title: item.title || defaultWorks[idx % defaultWorks.length]?.title || 'Art Piece',
-            artist: item.artist || defaultWorks[idx % defaultWorks.length]?.artist || 'Ajidhas',
-            year: item.year || defaultWorks[idx % defaultWorks.length]?.year || '2025',
-            medium: item.medium || defaultWorks[idx % defaultWorks.length]?.medium || 'Mixed Media',
-            image: item.image || getImage('art', idx, defaultWorks[idx % defaultWorks.length]?.image || art1)
-        }))
-        : defaultWorks.map((item, idx) => ({
-            ...item,
-            image: getImage('art', idx, item.image)
-        }));
-
+    const { wpContent, loading } = useContent();
     const [currentSlide, setCurrentSlide] = useState(0);
-    const [autoPlay, setAutoPlay] = useState(true);
-    const coverRef = useRef(null);
-    const contentRef = useRef(null);
+    const [menuOpen, setMenuOpen] = useState(false);
+    const menuToggleRef = useRef(null);
+    const works = Array.isArray(wpContent?.art?.items)
+        ? wpContent.art.items.filter((item) => item && (item.image || item.title))
+        : [];
+    const activeIndex = works.length ? currentSlide % works.length : 0;
+    const currentWork = works[activeIndex];
 
     useEffect(() => {
-        const tl = gsap.timeline();
+        if (works.length < 2) return undefined;
+        const timer = window.setInterval(() => setCurrentSlide((index) => (index + 1) % works.length), 5000);
+        return () => window.clearInterval(timer);
+    }, [works.length]);
 
-        if (coverRef.current) {
-            tl.fromTo(
-                coverRef.current,
-                { scale: 1.1, opacity: 0 },
-                { scale: 1, opacity: 1, duration: 1.5, ease: 'power3.out' }
-            );
-        }
-
-        if (contentRef.current && contentRef.current.children.length > 0) {
-            tl.fromTo(
-                contentRef.current.children,
-                { y: 80, opacity: 0 },
-                { y: 0, opacity: 1, duration: 1, stagger: 0.2, ease: 'power3.out' },
-                '-=1'
-            );
-        }
-    }, []);
-
-    // Auto-play slider
     useEffect(() => {
-        if (!autoPlay || recentWorks.length === 0) return;
-        const interval = setInterval(() => {
-            setCurrentSlide((prev) => ((prev < recentWorks.length ? prev : 0) + 1) % recentWorks.length);
-        }, 4000);
-        return () => clearInterval(interval);
-    }, [autoPlay, recentWorks.length]);
+        if (!menuOpen) return undefined;
+        const handleKeyDown = (event) => {
+            if (event.key === 'Escape') setMenuOpen(false);
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [menuOpen]);
 
-    const activeIndex = currentSlide < recentWorks.length ? currentSlide : 0;
-    const currentWork = recentWorks[activeIndex] || recentWorks[0] || defaultWorks[0];
+    const goTo = (path) => {
+        setMenuOpen(false);
+        navigate(path);
+    };
 
     return (
-        <div className="art-landing-page-new">
-            {/* Full-screen cover slide */}
-            <div className="cover-slide" ref={coverRef}>
-                <div className="cover-background">
-                    <img src={currentWork.image} alt={currentWork.title} key={currentWork.id || currentSlide} />
-                    <div className="cover-overlay"></div>
-                </div>
+        <div className="art-studio-page">
+            <div className="art-studio-page__background" aria-hidden="true" />
+            <header className="art-studio-header">
+                <Link className="art-studio-header__index" to="/" aria-label="Ajidhas Associates home">INDEX 02 / ART</Link>
+                <button
+                    ref={menuToggleRef}
+                    className={`art-studio-header__menu${menuOpen ? ' is-open' : ''}`}
+                    type="button"
+                    aria-label={menuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+                    aria-expanded={menuOpen}
+                    aria-controls="art-studio-menu"
+                    onClick={() => setMenuOpen((open) => !open)}
+                ><span /><span /><span /></button>
+            </header>
 
-                <div className="cover-content" ref={contentRef}>
-                    <div className="cover-header">
-                        <span className="cover-label">{headerLabel}</span>
-                        <h1 className="cover-title">{headerTitle}</h1>
-                        <p className="cover-subtitle">{headerSubtitle}</p>
-                    </div>
+            <main className="art-studio-main">
+                <section className="art-studio-hero" aria-labelledby="art-studio-title">
+                    <span className="art-studio-hero__rule" />
+                    <p className="art-studio-hero__eyebrow">ART STUDIO</p>
+                    <h1 id="art-studio-title">The Art Studio</h1>
+                    <p className="art-studio-hero__subtitle">CURATED WORKS FROM VISIONARY ARTISTS</p>
+                </section>
 
-                    <div className="featured-work">
-                        <div className="work-badge">Featured Work</div>
-                        <h2 className="work-title">{currentWork.title}</h2>
-                        <p className="work-meta">
-                            {currentWork.artist} • {currentWork.year} • {currentWork.medium}
-                        </p>
-                    </div>
+                <section className="art-feature" aria-label="Featured artwork" aria-live="polite">
+                    {currentWork ? <>
+                        <div className="art-feature__image">
+                            {currentWork.image ? <img src={currentWork.image} alt={currentWork.title || 'Featured artwork'} /> : <div className="art-feature__image-empty">Artwork image unavailable</div>}
+                        </div>
+                        <div className="art-feature__details">
+                            <p className="art-feature__label">FEATURED WORK</p>
+                            <span className="art-feature__rule" />
+                            <h2>{currentWork.title}</h2>
+                            <p className="art-feature__meta">{[currentWork.artist, currentWork.year, currentWork.medium].filter(Boolean).join('  ·  ')}</p>
+                        </div>
+                    </> : <div className="art-feature__empty">{loading ? 'Loading featured artwork…' : 'No featured artwork is available yet.'}</div>}
+                </section>
 
-                    <div className="cover-actions">
-                        <button
-                            className="cover-btn primary"
-                            onClick={() => navigate('/art/gallery')}
-                        >
-                            <span>Gallery</span>
-                            <IoArrowForward />
-                        </button>
-                        <button
-                            className="cover-btn secondary"
-                            onClick={() => navigate('/art/artist')}
-                        >
-                            <span>Artists</span>
-                            <IoArrowForward />
-                        </button>
-                    </div>
+                <nav className="art-studio-actions" aria-label="Explore the art studio">
+                    <button type="button" onClick={() => navigate('/art/gallery')}>GALLERY <span>→</span></button>
+                    <button type="button" onClick={() => navigate('/art/artist')}>ARTISTS <span>→</span></button>
+                </nav>
 
-                    <div className="slide-progress">
-                        {recentWorks.map((_, idx) => (
-                            <div
-                                key={idx}
-                                className={`progress-bar ${idx === activeIndex ? 'active' : ''} ${idx < activeIndex ? 'completed' : ''}`}
-                                onClick={() => {
-                                    setCurrentSlide(idx);
-                                    setAutoPlay(false);
-                                    setTimeout(() => setAutoPlay(true), 5000);
-                                }}
-                            >
-                                <div className="progress-fill"></div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </div>
+                {works.length > 1 && <div className="art-studio-pagination" aria-label="Featured artwork slides">
+                    {works.map((work, index) => <button
+                        type="button"
+                        key={work.id || `${work.title || 'work'}-${index}`}
+                        className={index === activeIndex ? 'is-active' : ''}
+                        aria-label={`Show artwork ${index + 1}`}
+                        aria-current={index === activeIndex ? 'true' : undefined}
+                        onClick={() => setCurrentSlide(index)}
+                    />)}
+                </div>}
+            </main>
+
+            <button className={`art-studio-menu-backdrop${menuOpen ? ' is-visible' : ''}`} type="button" aria-label="Close navigation menu" tabIndex={menuOpen ? 0 : -1} onClick={() => setMenuOpen(false)} />
+            <aside id="art-studio-menu" className={`art-studio-menu${menuOpen ? ' is-open' : ''}`} aria-hidden={!menuOpen}>
+                <p className="art-studio-menu__eyebrow">AJIDHAS ASSOCIATES</p>
+                <p className="art-studio-menu__heading">Explore the studio</p>
+                <button type="button" tabIndex={menuOpen ? 0 : -1} onClick={() => goTo('/')}>Studio <span>01</span></button>
+                <button type="button" tabIndex={menuOpen ? 0 : -1} onClick={() => goTo('/art')}>Art Studio <span>02</span></button>
+                <button type="button" tabIndex={menuOpen ? 0 : -1} onClick={() => goTo('/architecture')}>Architecture <span>03</span></button>
+                <p className="art-studio-menu__footer">Art and architecture, thoughtfully made.</p>
+            </aside>
         </div>
     );
 };
 
 export default ArtLanding;
+
