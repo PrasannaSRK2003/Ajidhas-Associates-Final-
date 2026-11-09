@@ -10,3 +10,11 @@
     z-index: 1;
     min-height: 100vh;
 }
+
+.main-content--gallery {
+    min-height: 0;
+}
+
+.main-content--artist {
+    min-height: 0;
+}

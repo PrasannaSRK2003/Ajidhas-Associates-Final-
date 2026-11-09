@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { IoArrowForward } from 'react-icons/io5';
+import { IoArrowForward, IoCallOutline, IoLocationOutline, IoMailOutline } from 'react-icons/io5';
 import { useContent } from '../../context/useContent';
 import './Footer.css';
 
@@ -33,14 +33,12 @@ const Footer = () => {
         ? wpContent.footer.explore_links
         : defaultExploreLinks;
 
-    const handleNewsletterSubmit = async (e) => {
-        e.preventDefault();
-        if (!email) return;
+    const handleNewsletterSubmit = async (event) => {
+        event.preventDefault();
+        if (!email || !submitInquiry) return;
         setStatus('submitting');
         try {
-            if (submitInquiry) {
-                await submitInquiry({ email, type: 'newsletter_subscription' });
-            }
+            await submitInquiry({ email, type: 'newsletter_subscription' });
             setStatus('success');
             setEmail('');
         } catch {
@@ -53,13 +51,15 @@ const Footer = () => {
             <div className="footer-content">
                 <div className="footer-brand">
                     <h3>{brandTitle}</h3>
+                    <p>Art and Architecture Studio</p>
+                    <span className="footer-brand__accent" aria-hidden="true" />
                 </div>
 
                 <div className="footer-section">
                     <h4>{exploreTitle}</h4>
                     <div className="footer-links">
-                        {exploreLinks.map((link, idx) => (
-                            <Link key={idx} to={link.url || '#'}>
+                        {exploreLinks.map((link, index) => (
+                            <Link key={`${link.url || link.label}-${index}`} to={link.url || '#'}>
                                 {link.label}
                             </Link>
                         ))}
@@ -68,10 +68,10 @@ const Footer = () => {
 
                 <div className="footer-section">
                     <h4>{contactTitle}</h4>
-                    <div className="footer-links">
-                        <p>{emailAddr}</p>
-                        <p>{phoneNum}</p>
-                        <p>{officeAddr.split('\n')[0]}</p>
+                    <div className="footer-links footer-contact-list">
+                        <p className="footer-contact-item"><IoMailOutline aria-hidden="true" /><span>{emailAddr}</span></p>
+                        <p className="footer-contact-item"><IoCallOutline aria-hidden="true" /><span>{phoneNum}</span></p>
+                        <p className="footer-contact-item"><IoLocationOutline aria-hidden="true" /><span>{officeAddr.split('\n')[0]}</span></p>
                     </div>
                 </div>
 
@@ -79,21 +79,23 @@ const Footer = () => {
                     <h4>{newsletterTitle}</h4>
                     <p>{newsletterDesc}</p>
                     {status === 'success' ? (
-                        <p style={{ color: '#10b981', fontSize: '0.85rem', marginTop: '10px' }}>✓ Subscribed successfully!</p>
+                        <p className="footer-newsletter__message" role="status">Subscribed successfully.</p>
                     ) : (
                         <form className="newsletter-form" onSubmit={handleNewsletterSubmit}>
                             <input
                                 type="email"
                                 value={email}
-                                onChange={(e) => setEmail(e.target.value)}
+                                onChange={(event) => { setEmail(event.target.value); setStatus('idle'); }}
                                 placeholder="Email Address"
+                                aria-label="Email address"
                                 required
                             />
-                            <button type="submit" disabled={status === 'submitting'}>
-                                <IoArrowForward />
+                            <button type="submit" aria-label="Subscribe" disabled={status === 'submitting'}>
+                                <IoArrowForward aria-hidden="true" />
                             </button>
                         </form>
                     )}
+                    {status === 'error' && <p className="footer-newsletter__message" role="alert">Unable to subscribe right now. Please try again.</p>}
                 </div>
             </div>
 

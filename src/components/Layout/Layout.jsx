@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { useLocation } from 'react-router-dom';
 import Navbar from '../Navbar/Navbar';
 import Footer from '../Footer/Footer';
@@ -10,6 +10,8 @@ const Layout = ({ children }) => {
     const isHomePage = location.pathname === '/';
     const isArtLandingPage = location.pathname === '/art';
     const isGalleryPage = location.pathname === '/art/gallery';
+    const isArtistPage = location.pathname === '/art/artist';
+    const isArchitectureLandingPage = location.pathname === '/architecture';
 
     const isLandscapePage = location.pathname.startsWith('/architecture/landscape');
 
@@ -17,13 +19,14 @@ const Layout = ({ children }) => {
 
     return (
         <div className="layout-wrapper">
-            {!isHomePage && !isLandscapePage && !isArtLandingPage && !isGalleryPage && <Navbar />}
-            <main className="main-content">
+            {!isHomePage && !isLandscapePage && !isArtLandingPage && !isGalleryPage && !isArtistPage && !isArchitectureLandingPage && <Navbar />}
+            <main className={`main-content${isGalleryPage ? ' main-content--gallery' : ''}${isArtistPage ? ' main-content--artist' : ''}`}>
                 {children}
             </main>
-            {!isHomePage && !isArtLandingPage && <Footer />}
+            <Footer />
         </div>
     );
 };
 
 export default Layout;
+
