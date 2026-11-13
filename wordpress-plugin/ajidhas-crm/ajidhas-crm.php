@@ -117,31 +117,46 @@ class Ajidhas_CRM_Content_Manager {
                 'bg_images' => array('', '', ''),
                 'projects' => array(
                     array(
-                        'title' => 'casa serena',
+                        'id' => '1',
+                        'category' => 'Cultural Center',
+                        'title' => 'Casa Serena Cultural Pavilion',
                         'location' => 'BARCELONA',
                         'year' => '2025',
                         'coords' => '41.3851° N, 2.1734° E',
                         'description' => 'a minimalist sanctuary where light dances through geometric volumes. clean lines meet warm materials in perfect harmony',
                         'designer' => 'ANTONI MARTÍNEZ',
-                        'image' => ''
+                        'media_type' => 'image',
+                        'image' => '',
+                        'video' => '',
+                        'gallery' => array()
                     ),
                     array(
-                        'title' => 'skyline residence',
+                        'id' => '2',
+                        'category' => 'Residential',
+                        'title' => 'Skyline Residence',
                         'location' => 'DUBAI',
                         'year' => '2025',
                         'coords' => '25.2048° N, 55.2708° E',
                         'description' => 'vertical living redefined. floor-to-ceiling glass frames the city below, while sustainable design meets luxury',
                         'designer' => 'FATIMA AL-RASHID',
-                        'image' => ''
+                        'media_type' => 'image',
+                        'image' => '',
+                        'video' => '',
+                        'gallery' => array()
                     ),
                     array(
-                        'title' => 'forest pavilion',
+                        'id' => '3',
+                        'category' => 'Hospitality',
+                        'title' => 'Forest Pavilion',
                         'location' => 'KYOTO',
                         'year' => '2024',
                         'coords' => '35.0116° N, 135.7681° E',
                         'description' => 'traditional japanese aesthetics reimagined. natural wood, stone gardens, and the gentle sound of water',
                         'designer' => 'KENJI TANAKA',
-                        'image' => ''
+                        'media_type' => 'image',
+                        'image' => '',
+                        'video' => '',
+                        'gallery' => array()
                     ),
                 )
             ),
@@ -368,6 +383,39 @@ class Ajidhas_CRM_Content_Manager {
             }
             unset($gallery_item);
         }
+        if (isset($stored['architecture']['projects']) && is_array($stored['architecture']['projects'])) {
+            $normalized_projects = array();
+            foreach (array_values($stored['architecture']['projects']) as $idx => $proj) {
+                if (!is_array($proj)) {
+                    continue;
+                }
+                $proj['id'] = !empty($proj['id']) ? (string) $proj['id'] : (string) ($idx + 1);
+                $proj['category'] = isset($proj['category']) && $proj['category'] !== '' ? $proj['category'] : 'Architecture';
+                $proj['text_position'] = (isset($proj['text_position']) && in_array($proj['text_position'], array('auto', 'right', 'left'), true))
+                    ? $proj['text_position']
+                    : 'auto';
+                $proj['media_type'] = (isset($proj['media_type']) && in_array($proj['media_type'], array('image', 'video'), true))
+                    ? $proj['media_type']
+                    : (!empty($proj['video']) ? 'video' : 'image');
+                $proj['video'] = isset($proj['video']) ? $proj['video'] : '';
+                if (isset($proj['hero_slides']) && is_array($proj['hero_slides'])) {
+                    $proj['hero_slides'] = array_values(array_filter($proj['hero_slides'], function($s) {
+                        return is_array($s) && !empty($s['url']);
+                    }));
+                } else {
+                    $proj['hero_slides'] = array();
+                }
+                if (isset($proj['gallery']) && is_array($proj['gallery'])) {
+                    $proj['gallery'] = array_values(array_filter($proj['gallery'], function($g) {
+                        return is_array($g) && !empty($g['url']);
+                    }));
+                } else {
+                    $proj['gallery'] = array();
+                }
+                $normalized_projects[] = $proj;
+            }
+            $stored['architecture']['projects'] = $normalized_projects;
+        }
         return $stored;
     }
 
@@ -531,9 +579,87 @@ class Ajidhas_CRM_Content_Manager {
         if (!current_user_can('manage_options')) return;
 
         if (isset($_POST['ajidhas_save_content']) && check_admin_referer('ajidhas_content_nonce')) {
-            $posted_data = isset($_POST['ajidhas_content']) ? $_POST['ajidhas_content'] : array();
+            $posted_data = isset($_POST['ajidhas_content']) && is_array($_POST['ajidhas_content'])
+                ? wp_unslash($_POST['ajidhas_content'])
+                : array();
+
+            if (isset($posted_data['architecture']['projects']) && is_array($posted_data['architecture']['projects'])) {
+                $clean_projects = array();
+                foreach (array_values($posted_data['architecture']['projects']) as $idx => $proj) {
+                    if (!is_array($proj)) {
+                        continue;
+                    }
+                    $clean_hero_slides = array();
+                    if (isset($proj['hero_slides']) && is_array($proj['hero_slides'])) {
+                        foreach (array_values($proj['hero_slides']) as $s_item) {
+                            if (!is_array($s_item)) {
+                                continue;
+                            }
+                            $s_url = isset($s_item['url']) ? esc_url_raw(trim($s_item['url'])) : '';
+                            if ($s_url === '') {
+                                continue;
+                            }
+                            $s_type = (isset($s_item['type']) && in_array($s_item['type'], array('image', 'video'), true))
+                                ? $s_item['type']
+                                : (preg_match('/\.(mp4|webm|ogg|mov|m4v)(\?.*)?$/i', $s_url) ? 'video' : 'image');
+                            $clean_hero_slides[] = array(
+                                'type' => $s_type,
+                                'url' => $s_url,
+                                'caption' => isset($s_item['caption']) ? sanitize_text_field($s_item['caption']) : '',
+                            );
+                        }
+                    }
+
+                    $clean_gallery = array();
+                    if (isset($proj['gallery']) && is_array($proj['gallery'])) {
+                        foreach (array_values($proj['gallery']) as $g_item) {
+                            if (!is_array($g_item)) {
+                                continue;
+                            }
+                            $g_url = isset($g_item['url']) ? esc_url_raw(trim($g_item['url'])) : '';
+                            if ($g_url === '') {
+                                continue;
+                            }
+                            $g_type = (isset($g_item['type']) && in_array($g_item['type'], array('image', 'video'), true))
+                                ? $g_item['type']
+                                : (preg_match('/\.(mp4|webm|ogg|mov|m4v)(\?.*)?$/i', $g_url) ? 'video' : 'image');
+                            $clean_gallery[] = array(
+                                'type' => $g_type,
+                                'url' => $g_url,
+                                'caption' => isset($g_item['caption']) ? sanitize_text_field($g_item['caption']) : '',
+                            );
+                        }
+                    }
+
+                    $hero_video = isset($proj['video']) ? esc_url_raw(trim($proj['video'])) : '';
+                    $media_type = (isset($proj['media_type']) && in_array($proj['media_type'], array('image', 'video'), true))
+                        ? $proj['media_type']
+                        : ($hero_video !== '' ? 'video' : 'image');
+
+                    $clean_projects[] = array(
+                        'id' => !empty($proj['id']) ? sanitize_text_field($proj['id']) : (string) ($idx + 1),
+                        'category' => isset($proj['category']) ? sanitize_text_field($proj['category']) : 'Architecture',
+                        'title' => isset($proj['title']) ? sanitize_text_field($proj['title']) : '',
+                        'designer' => isset($proj['designer']) ? sanitize_text_field($proj['designer']) : '',
+                        'location' => isset($proj['location']) ? sanitize_text_field($proj['location']) : '',
+                        'year' => isset($proj['year']) ? sanitize_text_field($proj['year']) : '',
+                        'coords' => isset($proj['coords']) ? sanitize_text_field($proj['coords']) : '',
+                        'description' => isset($proj['description']) ? sanitize_textarea_field($proj['description']) : '',
+                        'text_position' => (isset($proj['text_position']) && in_array($proj['text_position'], array('auto', 'right', 'left'), true))
+                            ? $proj['text_position']
+                            : 'auto',
+                        'media_type' => $media_type,
+                        'image' => isset($proj['image']) ? esc_url_raw(trim($proj['image'])) : '',
+                        'video' => $hero_video,
+                        'hero_slides' => $clean_hero_slides,
+                        'gallery' => $clean_gallery,
+                    );
+                }
+                $posted_data['architecture']['projects'] = $clean_projects;
+            }
+
             update_option($this->option_key, $posted_data);
-            echo '<div class="updated"><p><strong>Success!</strong> All section text, images, and background images saved.</p></div>';
+            echo '<div class="updated"><p><strong>Success!</strong> All section text, images, videos, and background images saved.</p></div>';
         }
 
         $content = $this->get_merged_content();
@@ -643,31 +769,35 @@ class Ajidhas_CRM_Content_Manager {
 
                     <hr style="margin: 25px 0; border: 0; border-top: 1px solid #e2e8f0;" />
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                        <h3 style="margin: 0;">🏛️ Editorial Architecture Projects (CRUD Manager)</h3>
-                        <button type="button" class="upload-btn" onclick="addEditorialProject()" style="background: #10b981;">+ Add New Editorial Project</button>
+                        <h3 style="margin: 0;">🏛️ Architecture Projects Showcase (Video, Image, Text &amp; Detail Gallery CRUD)</h3>
+                        <button type="button" class="upload-btn" onclick="addEditorialProject()" style="background: #10b981;">+ Add New Project</button>
                     </div>
-                    <p style="color: #64748b; font-size: 13px; margin-bottom: 16px;">Manage editorial showcase projects displayed on the Architecture Projects page. Create, Edit, or Delete projects dynamically.</p>
+                    <p style="color: #64748b; font-size: 13px; margin-bottom: 16px;">Manage projects displayed on <code>/architecture/projects</code> (full-bleed hero video/image carousel + catalog) and each project's detail gallery page.</p>
 
                     <div id="editorial-projects-container">
                         <?php
-                        $default_editorial_projects = array(
-                            array('title' => 'casa serena', 'location' => 'BARCELONA', 'year' => '2025', 'coords' => '41.3851° N, 2.1734° E', 'description' => 'a minimalist sanctuary where light dances through geometric volumes. clean lines meet warm materials in perfect harmony', 'designer' => 'ANTONI MARTÍNEZ', 'image' => ''),
-                            array('title' => 'skyline residence', 'location' => 'DUBAI', 'year' => '2025', 'coords' => '25.2048° N, 55.2708° E', 'description' => 'vertical living redefined. floor-to-ceiling glass frames the city below, while sustainable design meets luxury', 'designer' => 'FATIMA AL-RASHID', 'image' => ''),
-                            array('title' => 'forest pavilion', 'location' => 'KYOTO', 'year' => '2024', 'coords' => '35.0116° N, 135.7681° E', 'description' => 'traditional japanese aesthetics reimagined. natural wood, stone gardens, and the gentle sound of water', 'designer' => 'KENJI TANAKA', 'image' => ''),
-                        );
+                        $default_editorial_projects = $this->get_default_content()['architecture']['projects'];
                         $editorial_projects = !empty($content['architecture']['projects']) && is_array($content['architecture']['projects']) ? $content['architecture']['projects'] : $default_editorial_projects;
                         foreach ($editorial_projects as $index => $item) :
+                            $item_id = !empty($item['id']) ? (string) $item['id'] : (string) ($index + 1);
+                            $item_category = $item['category'] ?? 'Architecture';
                             $item_title = $item['title'] ?? '';
                             $item_location = $item['location'] ?? 'BARCELONA';
                             $item_year = $item['year'] ?? '2025';
                             $item_coords = $item['coords'] ?? '41.3851° N, 2.1734° E';
                             $item_desc = $item['description'] ?? '';
-                            $item_designer = $item['designer'] ?? 'ANTONI MARTÍNEZ';
+                            $item_designer = $item['designer'] ?? 'Ajidhas & Associates';
+                            $item_media_type = $item['media_type'] ?? (!empty($item['video']) ? 'video' : 'image');
+                            $item_text_position = $item['text_position'] ?? 'auto';
                             $item_img = $item['image'] ?? '';
+                            $item_video = $item['video'] ?? '';
+                            $item_hero_slides = !empty($item['hero_slides']) && is_array($item['hero_slides']) ? $item['hero_slides'] : array();
+                            $item_gallery = !empty($item['gallery']) && is_array($item['gallery']) ? $item['gallery'] : array();
                         ?>
-                            <div class="editorial-project-card" style="background: #f8fafc; border: 1px solid #cbd5e1; padding: 16px; border-radius: 8px; margin-bottom: 16px;">
+                            <div class="editorial-project-card" data-project-key="<?php echo esc_attr($index); ?>" style="background: #f8fafc; border: 1px solid #cbd5e1; padding: 16px; border-radius: 8px; margin-bottom: 16px;">
+                                <input type="hidden" name="ajidhas_content[architecture][projects][<?php echo $index; ?>][id]" value="<?php echo esc_attr($item_id); ?>" />
                                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                                    <h4 style="margin: 0; color: #0f172a;">Editorial Project #<span class="editorial-project-index"><?php echo ($index + 1); ?></span>: <span class="editorial-project-title-preview"><?php echo esc_html($item_title ?: 'Untitled Project'); ?></span></h4>
+                                    <h4 style="margin: 0; color: #0f172a;">Project #<span class="editorial-project-index"><?php echo ($index + 1); ?></span>: <span class="editorial-project-title-preview"><?php echo esc_html($item_title ?: 'Untitled Project'); ?></span></h4>
                                     <button type="button" class="clear-btn" onclick="removeEditorialProject(this)">🗑️ Delete Project</button>
                                 </div>
                                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
@@ -676,11 +806,15 @@ class Ajidhas_CRM_Content_Manager {
                                         <input type="text" name="ajidhas_content[architecture][projects][<?php echo $index; ?>][title]" value="<?php echo esc_attr($item_title); ?>" oninput="this.closest('.editorial-project-card').querySelector('.editorial-project-title-preview').innerText = this.value || 'Untitled Project'" />
                                     </div>
                                     <div class="form-row" style="margin-bottom: 0;">
-                                        <label>Designer Name</label>
-                                        <input type="text" name="ajidhas_content[architecture][projects][<?php echo $index; ?>][designer]" value="<?php echo esc_attr($item_designer); ?>" placeholder="e.g. ANTONI MARTÍNEZ" />
+                                        <label>Category / Eyebrow (e.g. Cultural Center, News)</label>
+                                        <input type="text" name="ajidhas_content[architecture][projects][<?php echo $index; ?>][category]" value="<?php echo esc_attr($item_category); ?>" placeholder="e.g. Cultural Center" />
                                     </div>
                                     <div class="form-row" style="margin-bottom: 0;">
-                                        <label>Location & Year</label>
+                                        <label>Architect / Designer</label>
+                                        <input type="text" name="ajidhas_content[architecture][projects][<?php echo $index; ?>][designer]" value="<?php echo esc_attr($item_designer); ?>" placeholder="e.g. Ajidhas & Associates" />
+                                    </div>
+                                    <div class="form-row" style="margin-bottom: 0;">
+                                        <label>Location &amp; Year</label>
                                         <div style="display: flex; gap: 8px;">
                                             <input type="text" name="ajidhas_content[architecture][projects][<?php echo $index; ?>][location]" value="<?php echo esc_attr($item_location); ?>" placeholder="Location" style="width: 60%;" />
                                             <input type="text" name="ajidhas_content[architecture][projects][<?php echo $index; ?>][year]" value="<?php echo esc_attr($item_year); ?>" placeholder="Year" style="width: 40%;" />
@@ -690,20 +824,117 @@ class Ajidhas_CRM_Content_Manager {
                                         <label>GPS Coordinates</label>
                                         <input type="text" name="ajidhas_content[architecture][projects][<?php echo $index; ?>][coords]" value="<?php echo esc_attr($item_coords); ?>" placeholder="e.g. 41.3851° N, 2.1734° E" />
                                     </div>
+                                    <div class="form-row" style="margin-bottom: 0;">
+                                        <label>Hero Display Mode</label>
+                                        <select name="ajidhas_content[architecture][projects][<?php echo $index; ?>][media_type]">
+                                            <option value="image" <?php selected($item_media_type, 'image'); ?>>Image</option>
+                                            <option value="video" <?php selected($item_media_type, 'video'); ?>>Video (plays on hero with poster)</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-row" style="margin-bottom: 0;">
+                                        <label>Scroll Section Text Corner</label>
+                                        <select name="ajidhas_content[architecture][projects][<?php echo $index; ?>][text_position]">
+                                            <option value="auto" <?php selected($item_text_position, 'auto'); ?>>Auto (Bottom Right &rarr; Bottom Left alternating)</option>
+                                            <option value="right" <?php selected($item_text_position, 'right'); ?>>Bottom Right</option>
+                                            <option value="left" <?php selected($item_text_position, 'left'); ?>>Bottom Left</option>
+                                        </select>
+                                    </div>
                                 </div>
                                 <div class="form-row" style="margin-top: 12px; margin-bottom: 0;">
-                                    <label>Editorial Description</label>
-                                    <textarea name="ajidhas_content[architecture][projects][<?php echo $index; ?>][description]" rows="2" placeholder="Brief project description"><?php echo esc_textarea($item_desc); ?></textarea>
+                                    <label>Project Description</label>
+                                    <textarea name="ajidhas_content[architecture][projects][<?php echo $index; ?>][description]" rows="3" placeholder="Brief project description"><?php echo esc_textarea($item_desc); ?></textarea>
                                 </div>
-                                <div class="form-row" style="margin-top: 12px; margin-bottom: 0;">
-                                    <label>Project Hero Image</label>
-                                    <input type="text" id="editorial_proj_img_<?php echo $index; ?>" name="ajidhas_content[architecture][projects][<?php echo $index; ?>][image]" value="<?php echo esc_url($item_img); ?>" placeholder="Leave empty to use default local background image" />
-                                    <button type="button" class="upload-btn" onclick="selectMedia('editorial_proj_img_<?php echo $index; ?>', 'editorial_proj_preview_<?php echo $index; ?>')">Choose Image</button>
-                                    <button type="button" class="clear-btn" onclick="clearMedia('editorial_proj_img_<?php echo $index; ?>', 'editorial_proj_preview_<?php echo $index; ?>')">Clear</button>
-                                    <img id="editorial_proj_preview_<?php echo $index; ?>" class="img-preview" src="<?php echo esc_url($item_img); ?>" style="<?php echo empty($item_img) ? 'display:none;' : ''; ?>" />
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px;">
+                                    <div class="form-row" style="margin-bottom: 0;">
+                                        <label>Hero Image (or Video Poster)</label>
+                                        <input type="text" id="editorial_proj_img_<?php echo $index; ?>" name="ajidhas_content[architecture][projects][<?php echo $index; ?>][image]" value="<?php echo esc_url($item_img); ?>" placeholder="Leave empty to use default local image" />
+                                        <button type="button" class="upload-btn" onclick="selectMedia('editorial_proj_img_<?php echo $index; ?>', 'editorial_proj_preview_<?php echo $index; ?>')">Choose Image</button>
+                                        <button type="button" class="clear-btn" onclick="clearMedia('editorial_proj_img_<?php echo $index; ?>', 'editorial_proj_preview_<?php echo $index; ?>')">Clear</button>
+                                        <img id="editorial_proj_preview_<?php echo $index; ?>" class="img-preview" src="<?php echo esc_url($item_img); ?>" style="<?php echo empty($item_img) ? 'display:none;' : ''; ?>" />
+                                    </div>
+                                    <div class="form-row" style="margin-bottom: 0;">
+                                        <label>Hero Video (MP4 / WebM URL)</label>
+                                        <input type="text" id="editorial_proj_vid_<?php echo $index; ?>" name="ajidhas_content[architecture][projects][<?php echo $index; ?>][video]" value="<?php echo esc_url($item_video); ?>" placeholder="Choose Video from WP Media or paste MP4 URL" />
+                                        <button type="button" class="upload-btn" onclick="selectVideoMedia('editorial_proj_vid_<?php echo $index; ?>', 'editorial_proj_vid_preview_<?php echo $index; ?>')">Choose Video</button>
+                                        <button type="button" class="clear-btn" onclick="clearMedia('editorial_proj_vid_<?php echo $index; ?>', 'editorial_proj_vid_preview_<?php echo $index; ?>')">Clear</button>
+                                        <video id="editorial_proj_vid_preview_<?php echo $index; ?>" class="img-preview" src="<?php echo esc_url($item_video); ?>" controls muted style="<?php echo empty($item_video) ? 'display:none;' : ''; ?>"></video>
+                                    </div>
+                                </div>
+
+                                <div style="margin-top: 16px; padding-top: 14px; border-top: 1px dashed #cbd5e1;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 8px; flex-wrap: wrap;">
+                                        <strong style="color: #1e293b;">🎞️ Showcase Slides (Multiple Images &amp; Videos — 5s Image / Auto-next after Video)</strong>
+                                        <div>
+                                            <button type="button" class="upload-btn" style="background: #6366f1; margin-top: 0;" onclick="bulkAddProjectMedia(this, 'hero_slides')">+ Bulk Add Images / Videos</button>
+                                            <button type="button" class="upload-btn" style="background: #0ea5e9; margin-top: 0; margin-left: 6px;" onclick="addProjectMediaItem(this, 'hero_slides')">+ Add Single Slide</button>
+                                        </div>
+                                    </div>
+                                    <div class="editorial-hero-slides-list">
+                                        <?php foreach ($item_hero_slides as $s_idx => $s_item) :
+                                            $s_type = ($s_item['type'] ?? 'image') === 'video' ? 'video' : 'image';
+                                            $s_url = $s_item['url'] ?? '';
+                                            $s_caption = $s_item['caption'] ?? '';
+                                            $s_uid = 'hs_' . $index . '_' . $s_idx;
+                                        ?>
+                                            <div class="editorial-gallery-row" style="background: #fff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px 12px; margin-bottom: 8px;">
+                                                <div style="display: grid; grid-template-columns: 110px 1fr 1fr auto; gap: 8px; align-items: center;">
+                                                    <select id="proj_media_type_<?php echo esc_attr($s_uid); ?>" name="ajidhas_content[architecture][projects][<?php echo $index; ?>][hero_slides][<?php echo $s_idx; ?>][type]">
+                                                        <option value="image" <?php selected($s_type, 'image'); ?>>Image</option>
+                                                        <option value="video" <?php selected($s_type, 'video'); ?>>Video</option>
+                                                    </select>
+                                                    <input type="text" id="proj_media_url_<?php echo esc_attr($s_uid); ?>" name="ajidhas_content[architecture][projects][<?php echo $index; ?>][hero_slides][<?php echo $s_idx; ?>][url]" value="<?php echo esc_url($s_url); ?>" placeholder="Image or Video URL" />
+                                                    <input type="text" name="ajidhas_content[architecture][projects][<?php echo $index; ?>][hero_slides][<?php echo $s_idx; ?>][caption]" value="<?php echo esc_attr($s_caption); ?>" placeholder="Caption (optional)" />
+                                                    <div style="white-space: nowrap;">
+                                                        <button type="button" class="upload-btn" style="margin-top: 0;" onclick="selectAnyMedia('proj_media_url_<?php echo esc_attr($s_uid); ?>', 'proj_media_img_prev_<?php echo esc_attr($s_uid); ?>', 'proj_media_vid_prev_<?php echo esc_attr($s_uid); ?>', 'proj_media_type_<?php echo esc_attr($s_uid); ?>')">Choose Media</button>
+                                                        <button type="button" class="clear-btn" style="margin-top: 0;" onclick="removeProjectGalleryItem(this)">Delete</button>
+                                                    </div>
+                                                </div>
+                                                <img id="proj_media_img_prev_<?php echo esc_attr($s_uid); ?>" class="img-preview" src="<?php echo $s_type === 'image' ? esc_url($s_url) : ''; ?>" style="<?php echo ($s_type === 'image' && !empty($s_url)) ? '' : 'display:none;'; ?>" />
+                                                <video id="proj_media_vid_prev_<?php echo esc_attr($s_uid); ?>" class="img-preview" src="<?php echo $s_type === 'video' ? esc_url($s_url) : ''; ?>" controls muted style="<?php echo ($s_type === 'video' && !empty($s_url)) ? '' : 'display:none;'; ?>"></video>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    </div>
+                                </div>
+
+                                <div style="margin-top: 16px; padding-top: 14px; border-top: 1px dashed #cbd5e1;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 8px; flex-wrap: wrap;">
+                                        <strong style="color: #1e293b;">🖼️ Detail Screen Gallery (Images &amp; Videos CRUD)</strong>
+                                        <div>
+                                            <button type="button" class="upload-btn" style="background: #6366f1; margin-top: 0;" onclick="bulkAddProjectMedia(this, 'gallery')">+ Bulk Add Images / Videos</button>
+                                            <button type="button" class="upload-btn" style="background: #0ea5e9; margin-top: 0; margin-left: 6px;" onclick="addProjectMediaItem(this, 'gallery')">+ Add Gallery Image / Video</button>
+                                        </div>
+                                    </div>
+                                    <div class="editorial-gallery-list">
+                                        <?php foreach ($item_gallery as $g_idx => $g_item) :
+                                            $g_type = ($g_item['type'] ?? 'image') === 'video' ? 'video' : 'image';
+                                            $g_url = $g_item['url'] ?? '';
+                                            $g_caption = $g_item['caption'] ?? '';
+                                            $g_uid = $index . '_' . $g_idx;
+                                        ?>
+                                            <div class="editorial-gallery-row" style="background: #fff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px 12px; margin-bottom: 8px;">
+                                                <div style="display: grid; grid-template-columns: 110px 1fr 1fr auto; gap: 8px; align-items: center;">
+                                                    <select id="proj_gal_type_<?php echo esc_attr($g_uid); ?>" name="ajidhas_content[architecture][projects][<?php echo $index; ?>][gallery][<?php echo $g_idx; ?>][type]">
+                                                        <option value="image" <?php selected($g_type, 'image'); ?>>Image</option>
+                                                        <option value="video" <?php selected($g_type, 'video'); ?>>Video</option>
+                                                    </select>
+                                                    <input type="text" id="proj_gal_url_<?php echo esc_attr($g_uid); ?>" name="ajidhas_content[architecture][projects][<?php echo $index; ?>][gallery][<?php echo $g_idx; ?>][url]" value="<?php echo esc_url($g_url); ?>" placeholder="Image or Video URL" />
+                                                    <input type="text" name="ajidhas_content[architecture][projects][<?php echo $index; ?>][gallery][<?php echo $g_idx; ?>][caption]" value="<?php echo esc_attr($g_caption); ?>" placeholder="Caption (optional)" />
+                                                    <div style="white-space: nowrap;">
+                                                        <button type="button" class="upload-btn" style="margin-top: 0;" onclick="selectAnyMedia('proj_gal_url_<?php echo esc_attr($g_uid); ?>', 'proj_gal_img_prev_<?php echo esc_attr($g_uid); ?>', 'proj_gal_vid_prev_<?php echo esc_attr($g_uid); ?>', 'proj_gal_type_<?php echo esc_attr($g_uid); ?>')">Choose Media</button>
+                                                        <button type="button" class="clear-btn" style="margin-top: 0;" onclick="removeProjectGalleryItem(this)">Delete</button>
+                                                    </div>
+                                                </div>
+                                                <img id="proj_gal_img_prev_<?php echo esc_attr($g_uid); ?>" class="img-preview" src="<?php echo $g_type === 'image' ? esc_url($g_url) : ''; ?>" style="<?php echo ($g_type === 'image' && !empty($g_url)) ? '' : 'display:none;'; ?>" />
+                                                <video id="proj_gal_vid_prev_<?php echo esc_attr($g_uid); ?>" class="img-preview" src="<?php echo $g_type === 'video' ? esc_url($g_url) : ''; ?>" controls muted style="<?php echo ($g_type === 'video' && !empty($g_url)) ? '' : 'display:none;'; ?>"></video>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    </div>
                                 </div>
                             </div>
                         <?php endforeach; ?>
+                    </div>
+                    <div style="margin-top: 12px;">
+                        <button type="button" class="upload-btn" onclick="addEditorialProject()" style="background: #10b981;">+ Add Another Architecture Project</button>
                     </div>
                 </div>
 
@@ -1568,6 +1799,60 @@ class Ajidhas_CRM_Content_Manager {
             frame.open();
         }
 
+        function selectVideoMedia(inputId, previewId) {
+            var frame = wp.media({
+                title: 'Select or Upload Video Asset',
+                library: { type: 'video' },
+                button: { text: 'Use Selected Video' },
+                multiple: false
+            });
+
+            frame.on('select', function() {
+                var attachment = frame.state().get('selection').first().toJSON();
+                document.getElementById(inputId).value = attachment.url;
+                var preview = document.getElementById(previewId);
+                if (preview) {
+                    preview.src = attachment.url;
+                    preview.style.display = 'block';
+                }
+            });
+
+            frame.open();
+        }
+
+        function selectAnyMedia(inputId, imgPreviewId, vidPreviewId, typeSelectId) {
+            var frame = wp.media({
+                title: 'Select or Upload Image or Video',
+                button: { text: 'Use Selected Media' },
+                multiple: false
+            });
+
+            frame.on('select', function() {
+                var attachment = frame.state().get('selection').first().toJSON();
+                var url = attachment.url || '';
+                var isVideo = attachment.type === 'video' || /\.(mp4|webm|ogg|mov|m4v)(\?.*)?$/i.test(url);
+
+                document.getElementById(inputId).value = url;
+                var typeSelect = document.getElementById(typeSelectId);
+                if (typeSelect) {
+                    typeSelect.value = isVideo ? 'video' : 'image';
+                }
+
+                var imgPreview = document.getElementById(imgPreviewId);
+                var vidPreview = document.getElementById(vidPreviewId);
+                if (imgPreview) {
+                    imgPreview.src = isVideo ? '' : url;
+                    imgPreview.style.display = (!isVideo && url) ? 'block' : 'none';
+                }
+                if (vidPreview) {
+                    vidPreview.src = isVideo ? url : '';
+                    vidPreview.style.display = (isVideo && url) ? 'block' : 'none';
+                }
+            });
+
+            frame.open();
+        }
+
         function clearMedia(inputId, previewId) {
             document.getElementById(inputId).value = '';
             var preview = document.getElementById(previewId);
@@ -1754,48 +2039,168 @@ class Ajidhas_CRM_Content_Manager {
         function addEditorialProject() {
             var container = document.getElementById('editorial-projects-container');
             var count = container.querySelectorAll('.editorial-project-card').length;
-            var index = Date.now();
+            var index = Date.now() + '_' + Math.floor(Math.random() * 1000);
             var html = `
-                <div class="editorial-project-card" style="background: #f8fafc; border: 1px solid #cbd5e1; padding: 16px; border-radius: 8px; margin-bottom: 16px;">
+                <div class="editorial-project-card" data-project-key="${index}" style="background: #f8fafc; border: 1px solid #cbd5e1; padding: 16px; border-radius: 8px; margin-bottom: 16px;">
+                    <input type="hidden" name="ajidhas_content[architecture][projects][${index}][id]" value="proj-${index}" />
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                        <h4 style="margin: 0; color: #0f172a;">Editorial Project #<span class="editorial-project-index">${count + 1}</span>: <span class="editorial-project-title-preview">New Project</span></h4>
+                        <h4 style="margin: 0; color: #0f172a;">Project #<span class="editorial-project-index">${count + 1}</span>: <span class="editorial-project-title-preview">New Project</span></h4>
                         <button type="button" class="clear-btn" onclick="removeEditorialProject(this)">🗑️ Delete Project</button>
                     </div>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                         <div class="form-row" style="margin-bottom: 0;">
                             <label>Project Title</label>
-                            <input type="text" name="ajidhas_content[architecture][projects][${index}][title]" value="" placeholder="e.g. casa serena" oninput="this.closest('.editorial-project-card').querySelector('.editorial-project-title-preview').innerText = this.value || 'Untitled Project'" />
+                            <input type="text" name="ajidhas_content[architecture][projects][${index}][title]" value="" placeholder="e.g. Bilbao Fine Arts Museum" oninput="this.closest('.editorial-project-card').querySelector('.editorial-project-title-preview').innerText = this.value || 'Untitled Project'" />
                         </div>
                         <div class="form-row" style="margin-bottom: 0;">
-                            <label>Designer Name</label>
-                            <input type="text" name="ajidhas_content[architecture][projects][${index}][designer]" value="ANTONI MARTÍNEZ" placeholder="e.g. ANTONI MARTÍNEZ" />
+                            <label>Category / Eyebrow</label>
+                            <input type="text" name="ajidhas_content[architecture][projects][${index}][category]" value="Cultural Center" placeholder="e.g. Cultural Center, News" />
                         </div>
                         <div class="form-row" style="margin-bottom: 0;">
-                            <label>Location & Year</label>
+                            <label>Architect / Designer</label>
+                            <input type="text" name="ajidhas_content[architecture][projects][${index}][designer]" value="Ajidhas & Associates" placeholder="e.g. Ajidhas & Associates" />
+                        </div>
+                        <div class="form-row" style="margin-bottom: 0;">
+                            <label>Location &amp; Year</label>
                             <div style="display: flex; gap: 8px;">
-                                <input type="text" name="ajidhas_content[architecture][projects][${index}][location]" value="BARCELONA" placeholder="Location" style="width: 60%;" />
-                                <input type="text" name="ajidhas_content[architecture][projects][${index}][year]" value="2025" placeholder="Year" style="width: 40%;" />
+                                <input type="text" name="ajidhas_content[architecture][projects][${index}][location]" value="Barcelona" placeholder="Location" style="width: 60%;" />
+                                <input type="text" name="ajidhas_content[architecture][projects][${index}][year]" value="${new Date().getFullYear()}" placeholder="Year" style="width: 40%;" />
                             </div>
                         </div>
                         <div class="form-row" style="margin-bottom: 0;">
                             <label>GPS Coordinates</label>
                             <input type="text" name="ajidhas_content[architecture][projects][${index}][coords]" value="41.3851° N, 2.1734° E" placeholder="e.g. 41.3851° N, 2.1734° E" />
                         </div>
+                        <div class="form-row" style="margin-bottom: 0;">
+                            <label>Hero Display Mode</label>
+                            <select name="ajidhas_content[architecture][projects][${index}][media_type]">
+                                <option value="image" selected>Image</option>
+                                <option value="video">Video (plays on hero with poster)</option>
+                            </select>
+                        </div>
+                        <div class="form-row" style="margin-bottom: 0;">
+                            <label>Scroll Section Text Corner</label>
+                            <select name="ajidhas_content[architecture][projects][${index}][text_position]">
+                                <option value="auto" selected>Auto (Bottom Right &rarr; Bottom Left alternating)</option>
+                                <option value="right">Bottom Right</option>
+                                <option value="left">Bottom Left</option>
+                            </select>
+                        </div>
                     </div>
                     <div class="form-row" style="margin-top: 12px; margin-bottom: 0;">
-                        <label>Editorial Description</label>
-                        <textarea name="ajidhas_content[architecture][projects][${index}][description]" rows="2" placeholder="Brief project description"></textarea>
+                        <label>Project Description</label>
+                        <textarea name="ajidhas_content[architecture][projects][${index}][description]" rows="3" placeholder="Brief project description"></textarea>
                     </div>
-                    <div class="form-row" style="margin-top: 12px; margin-bottom: 0;">
-                        <label>Project Hero Image</label>
-                        <input type="text" id="editorial_proj_img_${index}" name="ajidhas_content[architecture][projects][${index}][image]" value="" placeholder="Choose Image from WP Media" />
-                        <button type="button" class="upload-btn" onclick="selectMedia('editorial_proj_img_${index}', 'editorial_proj_preview_${index}')">Choose Image</button>
-                        <button type="button" class="clear-btn" onclick="clearMedia('editorial_proj_img_${index}', 'editorial_proj_preview_${index}')">Clear</button>
-                        <img id="editorial_proj_preview_${index}" class="img-preview" src="" style="display:none;" />
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px;">
+                        <div class="form-row" style="margin-bottom: 0;">
+                            <label>Hero Image (or Video Poster)</label>
+                            <input type="text" id="editorial_proj_img_${index}" name="ajidhas_content[architecture][projects][${index}][image]" value="" placeholder="Choose Image from WP Media" />
+                            <button type="button" class="upload-btn" onclick="selectMedia('editorial_proj_img_${index}', 'editorial_proj_preview_${index}')">Choose Image</button>
+                            <button type="button" class="clear-btn" onclick="clearMedia('editorial_proj_img_${index}', 'editorial_proj_preview_${index}')">Clear</button>
+                            <img id="editorial_proj_preview_${index}" class="img-preview" src="" style="display:none;" />
+                        </div>
+                        <div class="form-row" style="margin-bottom: 0;">
+                            <label>Hero Video (MP4 / WebM URL)</label>
+                            <input type="text" id="editorial_proj_vid_${index}" name="ajidhas_content[architecture][projects][${index}][video]" value="" placeholder="Choose Video from WP Media or paste MP4 URL" />
+                            <button type="button" class="upload-btn" onclick="selectVideoMedia('editorial_proj_vid_${index}', 'editorial_proj_vid_preview_${index}')">Choose Video</button>
+                            <button type="button" class="clear-btn" onclick="clearMedia('editorial_proj_vid_${index}', 'editorial_proj_vid_preview_${index}')">Clear</button>
+                            <video id="editorial_proj_vid_preview_${index}" class="img-preview" src="" controls muted style="display:none;"></video>
+                        </div>
+                    </div>
+                    <div style="margin-top: 16px; padding-top: 14px; border-top: 1px dashed #cbd5e1;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 8px; flex-wrap: wrap;">
+                            <strong style="color: #1e293b;">🎞️ Showcase Slides (Multiple Images &amp; Videos — 5s Image / Auto-next after Video)</strong>
+                            <div>
+                                <button type="button" class="upload-btn" style="background: #6366f1; margin-top: 0;" onclick="bulkAddProjectMedia(this, 'hero_slides')">+ Bulk Add Images / Videos</button>
+                                <button type="button" class="upload-btn" style="background: #0ea5e9; margin-top: 0; margin-left: 6px;" onclick="addProjectMediaItem(this, 'hero_slides')">+ Add Single Slide</button>
+                            </div>
+                        </div>
+                        <div class="editorial-hero-slides-list"></div>
+                    </div>
+                    <div style="margin-top: 16px; padding-top: 14px; border-top: 1px dashed #cbd5e1;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 8px; flex-wrap: wrap;">
+                            <strong style="color: #1e293b;">🖼️ Detail Screen Gallery (Images &amp; Videos CRUD)</strong>
+                            <div>
+                                <button type="button" class="upload-btn" style="background: #6366f1; margin-top: 0;" onclick="bulkAddProjectMedia(this, 'gallery')">+ Bulk Add Images / Videos</button>
+                                <button type="button" class="upload-btn" style="background: #0ea5e9; margin-top: 0; margin-left: 6px;" onclick="addProjectMediaItem(this, 'gallery')">+ Add Gallery Image / Video</button>
+                            </div>
+                        </div>
+                        <div class="editorial-gallery-list"></div>
                     </div>
                 </div>
             `;
             container.insertAdjacentHTML('beforeend', html);
+        }
+
+        function appendProjectMediaRow(list, projectKey, fieldName, mediaType, mediaUrl, mediaCaption) {
+            var mIdx = Date.now() + '_' + Math.floor(Math.random() * 100000);
+            var uid = fieldName + '_' + projectKey + '_' + mIdx;
+            var safeType = mediaType === 'video' ? 'video' : 'image';
+            var safeUrl = mediaUrl || '';
+            var safeCaption = (mediaCaption || '').replace(/"/g, '&quot;');
+            var html = `
+                <div class="editorial-gallery-row" style="background: #fff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px 12px; margin-bottom: 8px;">
+                    <div style="display: grid; grid-template-columns: 110px 1fr 1fr auto; gap: 8px; align-items: center;">
+                        <select id="proj_media_type_${uid}" name="ajidhas_content[architecture][projects][${projectKey}][${fieldName}][${mIdx}][type]">
+                            <option value="image" ${safeType === 'image' ? 'selected' : ''}>Image</option>
+                            <option value="video" ${safeType === 'video' ? 'selected' : ''}>Video</option>
+                        </select>
+                        <input type="text" id="proj_media_url_${uid}" name="ajidhas_content[architecture][projects][${projectKey}][${fieldName}][${mIdx}][url]" value="${safeUrl}" placeholder="Image or Video URL" />
+                        <input type="text" name="ajidhas_content[architecture][projects][${projectKey}][${fieldName}][${mIdx}][caption]" value="${safeCaption}" placeholder="Caption (optional)" />
+                        <div style="white-space: nowrap;">
+                            <button type="button" class="upload-btn" style="margin-top: 0;" onclick="selectAnyMedia('proj_media_url_${uid}', 'proj_media_img_prev_${uid}', 'proj_media_vid_prev_${uid}', 'proj_media_type_${uid}')">Choose Media</button>
+                            <button type="button" class="clear-btn" style="margin-top: 0;" onclick="removeProjectGalleryItem(this)">Delete</button>
+                        </div>
+                    </div>
+                    <img id="proj_media_img_prev_${uid}" class="img-preview" src="${safeType === 'image' ? safeUrl : ''}" style="${safeType === 'image' && safeUrl ? '' : 'display:none;'}" />
+                    <video id="proj_media_vid_prev_${uid}" class="img-preview" src="${safeType === 'video' ? safeUrl : ''}" controls muted style="${safeType === 'video' && safeUrl ? '' : 'display:none;'}"></video>
+                </div>
+            `;
+            list.insertAdjacentHTML('beforeend', html);
+        }
+
+        function addProjectMediaItem(btn, fieldName) {
+            var card = btn.closest('.editorial-project-card');
+            var projectKey = card.getAttribute('data-project-key');
+            var listClass = fieldName === 'hero_slides' ? '.editorial-hero-slides-list' : '.editorial-gallery-list';
+            var list = card.querySelector(listClass);
+            if (!list) return;
+            appendProjectMediaRow(list, projectKey, fieldName, 'image', '', '');
+        }
+
+        function bulkAddProjectMedia(btn, fieldName) {
+            var card = btn.closest('.editorial-project-card');
+            var projectKey = card.getAttribute('data-project-key');
+            var listClass = fieldName === 'hero_slides' ? '.editorial-hero-slides-list' : '.editorial-gallery-list';
+            var list = card.querySelector(listClass);
+            if (!list) return;
+
+            var frame = wp.media({
+                title: 'Select Multiple Images or Videos',
+                button: { text: 'Add Selected Media' },
+                multiple: true
+            });
+
+            frame.on('select', function() {
+                var selection = frame.state().get('selection').toJSON();
+                selection.forEach(function(attachment) {
+                    var url = attachment.url || '';
+                    if (!url) return;
+                    var isVideo = attachment.type === 'video' || /\.(mp4|webm|ogg|mov|m4v)(\?.*)?$/i.test(url);
+                    appendProjectMediaRow(list, projectKey, fieldName, isVideo ? 'video' : 'image', url, attachment.title || '');
+                });
+            });
+
+            frame.open();
+        }
+
+        function addProjectGalleryItem(btn) {
+            addProjectMediaItem(btn, 'gallery');
+        }
+
+        function removeProjectGalleryItem(btn) {
+            var row = btn.closest('.editorial-gallery-row');
+            if (row) row.remove();
         }
 
         function removeEditorialProject(btn) {

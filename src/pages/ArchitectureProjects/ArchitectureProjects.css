@@ -1,255 +1,306 @@
-.arch-projects-editorial {
+.arch-projects-page {
     width: 100%;
-    background: var(--color-deep-surface);
+    background: #141413;
+    color: #ffffff;
 }
 
-.project-editorial-section {
+/* =====================================================
+   Screen 1: Full-Bleed Architectural Hero Showcase
+   ===================================================== */
+.arch-hero-showcase {
     position: relative;
     width: 100%;
     height: 100vh;
+    height: 100svh;
+    min-height: 540px;
     overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    background: #141413;
+    outline: none;
 }
 
-.editorial-bg {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 0;
-}
-
-.editorial-bg img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    filter: brightness(0.6);
-}
-
-.editorial-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(to bottom,
-            rgba(0, 0, 0, 0.4) 0%,
-            transparent 30%,
-            transparent 70%,
-            rgba(0, 0, 0, 0.6) 100%);
-}
-
-.editorial-content {
+.arch-hero-slides {
     position: relative;
     width: 100%;
     height: 100%;
-    max-width: 1600px;
-    margin: 0 auto;
-    padding: clamp(40px, 6vw, 100px);
+}
+
+.arch-hero-slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1), visibility 0.85s;
+    z-index: 0;
+}
+
+.arch-hero-slide.is-active {
+    opacity: 1;
+    visibility: visible;
     z-index: 1;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto 1fr auto;
-    color: #fff;
 }
 
-.editorial-top-left {
-    grid-column: 1;
-    grid-row: 1;
+.arch-hero-media-btn {
+    display: block;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
 }
 
-.coords {
-    font-size: 0.8rem;
-    letter-spacing: 3px;
-    font-weight: 300;
-    opacity: 0.7;
+.arch-hero-media,
+.arch-scroll-media {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    transform: scale(1.015);
+    transition: transform 6.5s ease-out;
+}
+
+.arch-hero-slide.is-active .arch-hero-media,
+.arch-scroll-section:hover .arch-scroll-media {
+    transform: scale(1);
+}
+
+.arch-hero-scrim {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    background: linear-gradient(
+        to top,
+        rgba(10, 12, 16, 0.74) 0%,
+        rgba(10, 12, 16, 0.28) 30%,
+        rgba(10, 12, 16, 0.06) 58%,
+        rgba(10, 12, 16, 0.24) 100%
+    );
+}
+
+/* Bottom-Left Hero Caption */
+.arch-hero-caption {
+    position: absolute;
+    z-index: 4;
+    left: clamp(24px, 4.4vw, 68px);
+    bottom: clamp(32px, 4.5vh, 54px);
+    max-width: min(640px, 78vw);
+    color: #ffffff;
+    pointer-events: auto;
+}
+
+.arch-hero-category {
+    display: inline-block;
+    margin-bottom: 6px;
     font-family: var(--font-main);
+    font-size: clamp(0.85rem, 1vw, 1rem);
+    font-weight: 500;
+    letter-spacing: 0.03em;
+    color: rgba(255, 255, 255, 0.9);
 }
 
-.editorial-top-right {
-    grid-column: 2;
-    grid-row: 1;
-    text-align: right;
+.arch-hero-title-btn {
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #ffffff;
+    text-align: inherit;
+    cursor: pointer;
 }
 
-.location-year {
-    font-size: 0.8rem;
-    letter-spacing: 4px;
-    text-transform: uppercase;
-    font-weight: 400;
-    opacity: 0.8;
-}
-
-.editorial-center-right {
-    grid-column: 2;
-    grid-row: 2;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    justify-content: center;
-    margin-top: -10vh;
-}
-
-.editorial-title {
+.arch-hero-title-btn h1,
+.arch-hero-title-btn h2 {
+    margin: 0;
     font-family: var(--font-main);
-    font-size: 2rem;
-    /* Changed from clamp(4rem, 12vw, 9rem) to 2rem */
-    font-weight: 600;
-    line-height: 0.85;
-    text-align: right;
-    letter-spacing: -1px;
-    /* Adjusted letter spacing for smaller size */
-    text-transform: lowercase;
-    margin-bottom: 20px;
+    font-size: clamp(1.55rem, 2.6vw, 2.45rem);
+    font-weight: 500;
+    line-height: 1.18;
+    letter-spacing: -0.015em;
+    color: #ffffff;
+    text-shadow: 0 2px 16px rgba(0, 0, 0, 0.35);
+    transition: opacity 0.25s ease;
 }
 
-.editorial-bottom-right {
-    grid-column: 2;
-    grid-row: 3;
-    display: flex;
-    justify-content: flex-end;
-    align-items: flex-end;
+.arch-hero-title-btn:hover h1,
+.arch-hero-title-btn:hover h2 {
+    opacity: 0.82;
 }
 
-.editorial-description {
-    max-width: 450px;
-    font-size: clamp(0.9rem, 1.5vw, 1.1rem);
-    line-height: 1.5;
-    font-weight: 300;
-    text-align: right;
-    opacity: 0.8;
-    letter-spacing: 0.5px;
-}
-
-.editorial-bottom-left {
-    grid-column: 1;
-    grid-row: 3;
-    display: flex;
-    align-items: flex-end;
-}
-
-.designer-info {
+/* Bottom-Center Pagination Dots */
+.arch-hero-dots {
+    position: absolute;
+    z-index: 4;
+    left: 50%;
+    bottom: clamp(22px, 3.4vh, 36px);
+    transform: translateX(-50%);
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 14px;
 }
 
-.designer-icon {
-    width: 35px;
-    height: 35px;
-    background: rgba(255, 255, 255, 0.1);
+.arch-hero-dot {
+    width: 6px;
+    height: 6px;
+    padding: 0;
+    border: 0;
     border-radius: 50%;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    background-image: url('https://api.dicebear.com/7.x/avataaars/svg?seed=Felix');
-    background-size: cover;
+    background: rgba(255, 255, 255, 0.48);
+    cursor: pointer;
+    transition: transform 0.25s ease, background-color 0.25s ease, box-shadow 0.25s ease;
 }
 
-.designer-info p {
-    font-size: 0.7rem;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    font-weight: 500;
-    opacity: 0.6;
+.arch-hero-dot:hover {
+    background: rgba(255, 255, 255, 0.85);
 }
 
-@media (max-width: 1024px) {
-    .editorial-content {
-        padding: 60px;
-    }
-
-    .editorial-title {
-        font-size: 2rem;
-        /* Consistent size */
-    }
+.arch-hero-dot.is-active {
+    background: #ffffff;
+    transform: scale(1.35);
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.28);
 }
 
-@media (max-width: 768px) {
-    .editorial-content {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto auto 1fr auto auto;
-        padding: 40px 30px;
-        gap: 30px;
-    }
-
-    .editorial-top-right {
-        grid-column: 1;
-        grid-row: 2;
-        text-align: left;
-    }
-
-    .editorial-center-right {
-        grid-column: 1;
-        grid-row: 3;
-        align-items: flex-start;
-        margin-top: 0;
-    }
-
-    .editorial-title {
-        text-align: left;
-        font-size: 2rem;
-        /* Consistent size */
-        letter-spacing: -1px;
-    }
-
-    .editorial-bottom-right {
-        grid-column: 1;
-        grid-row: 4;
-        justify-content: flex-start;
-    }
-
-    .editorial-description {
-        text-align: left;
-        max-width: 100%;
-    }
-
-    .editorial-bottom-left {
-        grid-column: 1;
-        grid-row: 5;
-    }
+/* Right-Center Fixed Frosted Vertical Scroll Pill */
+.arch-hero-scroll-pill {
+    position: fixed;
+    z-index: 25;
+    right: clamp(16px, 2.3vw, 34px);
+    top: 50%;
+    transform: translateY(-50%);
+    width: 42px;
+    height: 80px;
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.22);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    color: #ffffff;
+    font-size: 1.35rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.25s ease, transform 0.25s ease, opacity 0.25s ease;
 }
 
-/* Alternating Layout for Even Items (Left Aligned) */
-.layout-left .editorial-center-right {
-    grid-column: 1;
-    align-items: flex-start;
+.arch-hero-scroll-pill svg {
+    transition: transform 0.3s ease;
 }
 
-.layout-left .editorial-title {
+.arch-hero-scroll-pill.is-up svg {
+    transform: rotate(180deg);
+}
+
+.arch-hero-scroll-pill.is-hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.arch-hero-scroll-pill:hover {
+    background: rgba(255, 255, 255, 0.34);
+    transform: translateY(calc(-50% + 3px));
+}
+
+/* =====================================================
+   Full-Screen Scrollable Project Sections (Alternating)
+   ===================================================== */
+.arch-scroll-stack {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.arch-scroll-section {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    height: 100svh;
+    min-height: 540px;
+    overflow: hidden;
+    background: #141413;
+}
+
+.arch-scroll-caption {
+    position: absolute;
+    z-index: 4;
+    bottom: clamp(32px, 5vh, 58px);
+    max-width: min(620px, 76vw);
+    color: #ffffff;
+    pointer-events: auto;
+}
+
+.arch-scroll-caption.is-right {
+    right: clamp(24px, 4.4vw, 68px);
+    left: auto;
+    text-align: right;
+}
+
+.arch-scroll-caption.is-left {
+    left: clamp(24px, 4.4vw, 68px);
+    right: auto;
     text-align: left;
 }
 
-.layout-left .editorial-bottom-right {
-    grid-column: 1;
-    justify-content: flex-start;
-    text-align: left;
+.arch-scroll-desc {
+    margin-top: 8px;
+    font-size: clamp(0.88rem, 1.05vw, 1rem);
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.84);
+    text-shadow: 0 1px 10px rgba(0, 0, 0, 0.35);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
-.layout-left .editorial-description {
-    text-align: left;
+/* =====================================================
+   Responsive Breakpoints
+   ===================================================== */
+@media (max-width: 640px) {
+    .arch-hero-caption {
+        left: 20px;
+        right: 72px;
+        bottom: 58px;
+        max-width: none;
+    }
+
+    .arch-scroll-caption {
+        bottom: 34px;
+        max-width: calc(100vw - 40px);
+    }
+
+    .arch-scroll-caption.has-dots {
+        bottom: 58px;
+    }
+
+    .arch-scroll-caption.is-right {
+        right: 20px;
+        left: 20px;
+    }
+
+    .arch-scroll-caption.is-left {
+        left: 20px;
+        right: 20px;
+    }
+
+    .arch-hero-dots {
+        bottom: 22px;
+        gap: 10px;
+    }
+
+    .arch-hero-scroll-pill {
+        width: 36px;
+        height: 66px;
+        right: 14px;
+        font-size: 1.15rem;
+    }
 }
 
-.layout-left .editorial-bottom-left {
-    grid-column: 2;
-    justify-content: flex-end;
-}
-
-/* Ensure mobile styles override these if necessary */
-@media (max-width: 768px) {
-    .layout-left .editorial-center-right {
-        grid-column: 1;
-        align-items: flex-start;
+@media (prefers-reduced-motion: reduce) {
+    .arch-hero-slide,
+    .arch-hero-media,
+    .arch-scroll-media {
+        transition: none;
     }
-
-    .layout-left .editorial-bottom-right {
-        grid-column: 1;
-    }
-
-    .layout-left .editorial-bottom-left {
-        grid-column: 1;
-        justify-content: flex-start;
-    }
-    .coords{padding-top: 1.8rem;}
 }

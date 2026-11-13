@@ -7,6 +7,7 @@ import Art from './pages/Art/Art';
 import ArtLanding from './pages/ArtLanding/ArtLanding';
 import ArchitectureLanding from './pages/ArchitectureLanding/ArchitectureLanding';
 import ArchitectureProjects from './pages/ArchitectureProjects/ArchitectureProjects';
+import ArchitectureProjectsDetail from './pages/ArchitectureProjects/ArchitectureProjectsDetail';
 import ArchitectureAllWork from './pages/ArchitectureAllWork/ArchitectureAllWork';
 import ArchitectureProjectDetail from './pages/ArchitectureProjectDetail/ArchitectureProjectDetail';
 import Interior from './pages/Interior/Interior';
@@ -42,6 +43,7 @@ function App() {
             <Route path="/art/artist" element={<Artist />} />
             <Route path="/architecture" element={<ArchitectureLanding />} />
             <Route path="/architecture/projects" element={<ArchitectureProjects />} />
+            <Route path="/architecture/projects/:id" element={<ArchitectureProjectsDetail />} />
             <Route path="/architecture/all-work" element={<ArchitectureAllWork />} />
             <Route path="/architecture/project/:id" element={<ArchitectureProjectDetail />} />
             <Route path="/architecture/interior" element={<Interior />} />
